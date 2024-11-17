@@ -1,23 +1,26 @@
 
 import './App.css';
+import Dashboard from "./pages/Dashboard/Dashboard";
+import Header from './components/Header/Header';
+// import Sidebar from './components/Sidebar/Sidebar';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import InventoryAnalysis from './components/InventoryAnalysis/InventoryAnalysis';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <Router>
+    <div className="app">
+      <Header />
+      
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/inventory-analysis" element={<InventoryAnalysis />} />
+      </Routes>
+   
+       {/* <Sidebar /> */}
+    
     </div>
+    </Router>
   );
 }
 
