@@ -1,0 +1,28 @@
+.sidebar {
+  height: auto;
+  background-color: #2f3e46;
+  padding: 20px;
+  width: 200px;
+  min-height: 100vh;
+  color: #ffffff;
+}
+
+  
+.menu-item {
+  padding: 10px 15px;
+  font-size: 16px;
+  color: white;
+  margin-bottom: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.menu-item.active {
+  background-color: #4d4d82;
+  color: #fff;
+}
+
+.menu-item:hover {
+  background-color: #817c7c;
+}
