@@ -21,3 +21,13 @@ class ProductCountView(APIView):
             rows = cursor.fetchall()
         productsCount = {"count": rows[0][0]}
         return Response(productsCount)
+
+class Top15ProductsExpiringSoonView(APIView):
+    def get(self, request):
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT p.Name,ExpiryDate, s.Name, SUM(i.Quantity) AS QuantityOfProductsGettingExpired FROM Product p LEFT JOIN Supplier s ON p.SupplierId = s.SupplierId INNER JOIN Inventory i ON i.ProductId = p.ProductId GROUP BY 1,2,3 ORDER BY ExpiryDate DESC LIMIT 15")
+            rows = cursor.fetchall()
+        products = [{"ProductName": row[0], "ExpiryDate": row[1], "SupplierName": row[2], "QuantityOfProductsGettingExpired": row[3]} for row in rows]
+        return Response(products)
+
+
