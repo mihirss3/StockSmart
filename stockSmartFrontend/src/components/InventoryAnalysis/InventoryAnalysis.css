@@ -1,13 +1,12 @@
 
   /* Container */
+
+
   .inventory-analysis-container {
     display: flex;
+    flex-direction: column;
     height: 100vh;
-    width: 100%;
   }
-.content {
-  width: 100%;
-}
   /* Main Content */
   .main-content {
     flex: 1;
@@ -74,4 +73,8 @@
     background-color: #ffefdb;
     color: #cc5500;
   }
-  
+
+  .queryTable{
+    display: block;
+    text-align: center;
+  }
