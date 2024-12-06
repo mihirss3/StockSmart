@@ -1,6 +1,29 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # backend
-.idea
+# Byte-compiled / optimized / DLL files
+v1/__pycache__/
+v1/*.py[cod]
+v1/*$py.class
 
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+# Environments
+.env
+.venv
+env/
+venv/
+
+# Django Project files
+*.log
+local_settings.py
+db.sqlite3
+media/
+static/
+
+# IDE-specific files
+.idea/
+.vscode/
 
