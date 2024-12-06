@@ -2,9 +2,9 @@
 
 # backend
 # Byte-compiled / optimized / DLL files
-v1/__pycache__/
-v1/*.py[cod]
-v1/*$py.class
+v1/*/__pycache__/
+v1/*/*.py[cod]
+v1/*/*$py.class
 
 # Distribution / packaging
 *.egg-info/
