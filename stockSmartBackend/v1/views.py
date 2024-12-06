@@ -149,6 +149,606 @@ class AdminAdministerUserView(APIView):
                     "message": "Failed to update user"
                 }, status=400)
 
+class AdminAdministerInventoryView(APIView):
+    def post(self, request):
+        data = request.data
+        result, exception = postToDB("""
+            INSERT INTO Inventory(InventoryId, StockDate, ProductId, UnitPrice, ManufactureDate, ExpiryDate, Quantity)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """, (
+            data.get("InventoryId"),
+            data.get("StockDate"),
+            data.get("ProductId"),
+            data.get("UnitPrice"),
+            data.get("ManufactureDate"),
+            data.get("ExpiryDate"),
+            data.get("Quantity")
+        ))
 
+        if exception:
+            return Response({
+                "success": False,
+                "message": str(exception)
+            }, status=500)
 
+        if result:
+            rows = getFromDB("""SELECT * FROM Inventory WHERE InventoryId = %s""", (data.get("InventoryId"),))
+            new_inventory = rows[0]
+            return Response({
+                "success": True,
+                "message": "Inventory created successfully",
+                "data": {
+                    "Inventory": {
+                        "InventoryId": new_inventory[0],
+                        "StockDate": new_inventory[1],
+                        "ProductId": new_inventory[2],
+                        "UnitPrice": new_inventory[3],
+                        "ManufactureDate": new_inventory[4],
+                        "ExpiryDate": new_inventory[5],
+                        "Quantity": new_inventory[6]
+                    }
+                }
+            }, status=201)
 
+        return Response({
+            "success": False,
+            "message": "Failed to create inventory"
+        }, status=400)
+
+    def get(self, request):
+        data = []
+        rows = getFromDB("""SELECT * FROM Inventory""", ())
+        for row in rows:
+            data.append({
+                "InventoryId": row[0],
+                "StockDate": row[1],
+                "ProductId": row[2],
+                "UnitPrice": row[3],
+                "ManufactureDate": row[4],
+                "ExpiryDate": row[5],
+                "Quantity": row[6]
+            })
+        return Response({
+            "success": True,
+            "message": "Inventory data fetched successfully",
+            "data": {"Inventory": data}
+        }, status=200)
+
+    def put(self, request, inventory_id):
+        data = request.data
+        update_query = """
+            UPDATE Inventory 
+            SET StockDate = %s, ProductId = %s, UnitPrice = %s, ManufactureDate = %s, ExpiryDate = %s, Quantity = %s
+            WHERE InventoryId = %s
+        """
+        result, exception = postToDB(update_query, (
+            data.get("StockDate"),
+            data.get("ProductId"),
+            data.get("UnitPrice"),
+            data.get("ManufactureDate"),
+            data.get("ExpiryDate"),
+            data.get("Quantity"),
+            inventory_id
+        ))
+
+        if exception:
+            return Response({
+                "success": False,
+                "message": str(exception)
+            }, status=500)
+
+        if result:
+            rows = getFromDB("""SELECT * FROM Inventory WHERE InventoryId = %s""", (inventory_id,))
+            updated_inventory = rows[0]
+            return Response({
+                "success": True,
+                "message": "Inventory updated successfully",
+                "data": {
+                    "Inventory": {
+                        "InventoryId": updated_inventory[0],
+                        "StockDate": updated_inventory[1],
+                        "ProductId": updated_inventory[2],
+                        "UnitPrice": updated_inventory[3],
+                        "ManufactureDate": updated_inventory[4],
+                        "ExpiryDate": updated_inventory[5],
+                        "Quantity": updated_inventory[6]
+                    }
+                }
+            }, status=200)
+        else:
+            return Response({
+                "success": False,
+                "message": "Failed to update inventory"
+            }, status=400)
+
+    def delete(self, request, inventory_id):
+        result, exception = deleteFromDB("DELETE FROM Inventory WHERE InventoryId = %s", (inventory_id,))
+        if exception:
+            return Response({
+                "success": False,
+                "message": str(exception)
+            }, status=500)
+        else:
+            if result:
+                return Response({
+                    "success": True,
+                    "message": "Inventory deleted successfully"
+                }, status=200)
+            else:
+                return Response({
+                    "success": False,
+                    "message": "Inventory not found"
+                }, status=404)
+
+class AdminAdministerSupplierView(APIView):
+    def post(self, request):
+        data = request.data
+        result, exception = postToDB("""
+            INSERT INTO Supplier(SupplierId, Name, Address, Contact)
+            VALUES (%s, %s, %s, %s)
+        """, (
+            data.get("SupplierId"),
+            data.get("Name"),
+            data.get("Address"),
+            data.get("Contact")
+        ))
+
+        if exception:
+            return Response({
+                "success": False,
+                "message": str(exception)
+            }, status=500)
+
+        if result:
+            rows = getFromDB("""SELECT * FROM Supplier WHERE SupplierId = %s""", (data.get("SupplierId"),))
+            new_supplier = rows[0]
+            return Response({
+                "success": True,
+                "message": "Supplier created successfully",
+                "data": {
+                    "Supplier": {
+                        "SupplierId": new_supplier[0],
+                        "Name": new_supplier[1],
+                        "Address": new_supplier[2],
+                        "Contact": new_supplier[3]
+                    }
+                }
+            }, status=201)
+
+        return Response({
+            "success": False,
+            "message": "Failed to create supplier"
+        }, status=400)
+
+    def get(self, request):
+        data = []
+        rows = getFromDB("""SELECT SupplierId, Name, Address, Contact FROM Supplier""", ())
+        for row in rows:
+            data.append({
+                "SupplierId": row[0],
+                "Name": row[1],
+                "Address": row[2],
+                "Contact": row[3]
+            })
+        return Response({
+            "success": True,
+            "message": "Supplier data fetched successfully",
+            "data": {"Suppliers": data}
+        }, status=200)
+
+    def put(self, request, supplier_id):
+        data = request.data
+        update_query = """
+            UPDATE Supplier 
+            SET Name = %s, Address = %s, Contact = %s
+            WHERE SupplierId = %s
+        """
+        result, exception = postToDB(update_query, (
+            data.get("Name"), data.get("Address"), data.get("Contact"), supplier_id
+        ))
+
+        if exception:
+            return Response({
+                "success": False,
+                "message": str(exception)
+            }, status=500)
+
+        if result:
+            rows = getFromDB("""SELECT * FROM Supplier WHERE SupplierId = %s""", (supplier_id,))
+            updated_supplier = rows[0]
+            return Response({
+                "success": True,
+                "message": "Supplier updated successfully",
+                "data": {
+                    "Supplier": {
+                        "SupplierId": updated_supplier[0],
+                        "Name": updated_supplier[1],
+                        "Address": updated_supplier[2],
+                        "Contact": updated_supplier[3]
+                    }
+                }
+            }, status=200)
+        else:
+            return Response({
+                "success": False,
+                "message": "Failed to update supplier"
+            }, status=400)
+
+    def delete(self, request, supplier_id):
+        result, exception = deleteFromDB("DELETE FROM Supplier WHERE SupplierId = %s", (supplier_id,))
+        if exception:
+            return Response({
+                "success": False,
+                "message": str(exception)
+            }, status=500)
+        else:
+            if result:
+                return Response({
+                    "success": True,
+                    "message": "Supplier deleted successfully"
+                }, status=200)
+            else:
+                return Response({
+                    "success": False,
+                    "message": "Supplier not found"
+                }, status=404)
+
+class AdminAdministerCategoryView(APIView):
+    def post(self, request):
+        data = request.data
+        result, exception = postToDB("""
+            INSERT INTO Category(CategoryId, Name, LeadTime, StorageRequirements)
+            VALUES (%s, %s, %s, %s)
+        """, (
+            data.get("CategoryId"),
+            data.get("Name"),
+            data.get("LeadTime"),
+            data.get("StorageRequirements")
+        ))
+
+        if exception:
+            return Response({
+                "success": False,
+                "message": str(exception)
+            }, status=500)
+
+        if result:
+            rows = getFromDB("""SELECT * FROM Category WHERE CategoryId = %s""", (data.get("CategoryId"),))
+            new_category = rows[0]
+            return Response({
+                "success": True,
+                "message": "Category created successfully",
+                "data": {
+                    "Category": {
+                        "CategoryId": new_category[0],
+                        "Name": new_category[1],
+                        "LeadTime": new_category[2],
+                        "StorageRequirements": new_category[3]
+                    }
+                }
+            }, status=201)
+
+        return Response({
+            "success": False,
+            "message": "Failed to create category"
+        }, status=400)
+
+    def get(self, request):
+        data = []
+        rows = getFromDB("""SELECT CategoryId, Name, LeadTime, StorageRequirements FROM Category""", ())
+        for row in rows:
+            data.append({
+                "CategoryId": row[0],
+                "Name": row[1],
+                "LeadTime": row[2],
+                "StorageRequirements": row[3]
+            })
+        return Response({
+            "success": True,
+            "message": "Category data fetched successfully",
+            "data": {"Categories": data}
+        }, status=200)
+
+    def put(self, request, category_id):
+        data = request.data
+        update_query = """
+            UPDATE Category 
+            SET Name = %s, LeadTime = %s, StorageRequirements = %s
+            WHERE CategoryId = %s
+        """
+        result, exception = postToDB(update_query, (
+            data.get("Name"),
+            data.get("LeadTime"),
+            data.get("StorageRequirements"),
+            category_id
+        ))
+
+        if exception:
+            return Response({
+                "success": False,
+                "message": str(exception)
+            }, status=500)
+
+        if result:
+            rows = getFromDB("""SELECT * FROM Category WHERE CategoryId = %s""", (category_id,))
+            updated_category = rows[0]
+            return Response({
+                "success": True,
+                "message": "Category updated successfully",
+                "data": {
+                    "Category": {
+                        "CategoryId": updated_category[0],
+                        "Name": updated_category[1],
+                        "LeadTime": updated_category[2],
+                        "StorageRequirements": updated_category[3]
+                    }
+                }
+            }, status=200)
+        else:
+            return Response({
+                "success": False,
+                "message": "Failed to update category"
+            }, status=400)
+
+    def delete(self, request, category_id):
+        result, exception = deleteFromDB("DELETE FROM Category WHERE CategoryId = %s", (category_id,))
+        if exception:
+            return Response({
+                "success": False,
+                "message": str(exception)
+            }, status=500)
+        else:
+            if result:
+                return Response({
+                    "success": True,
+                    "message": "Category deleted successfully"
+                }, status=200)
+            else:
+                return Response({
+                    "success": False,
+                    "message": "Category not found"
+                }, status=404)
+
+class AdminAdministerProductView(APIView):
+    def post(self, request):
+        data = request.data
+        result, exception = postToDB("""
+            INSERT INTO Product(ProductId, Name, PackagingType, Weight, CategoryId, SupplierId)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (
+            data.get("ProductId"),
+            data.get("Name"),
+            data.get("PackagingType"),
+            data.get("Weight"),
+            data.get("CategoryId"),
+            data.get("SupplierId")
+        ))
+
+        if exception:
+            return Response({
+                "success": False,
+                "message": str(exception)
+            }, status=500)
+
+        if result:
+            rows = getFromDB("""SELECT * FROM Product WHERE ProductId = %s""", (data.get("ProductId"),))
+            new_product = rows[0]
+            return Response({
+                "success": True,
+                "message": "Product created successfully",
+                "data": {
+                    "Product": {
+                        "ProductId": new_product[0],
+                        "Name": new_product[1],
+                        "PackagingType": new_product[2],
+                        "Weight": new_product[3],
+                        "CategoryId": new_product[4],
+                        "SupplierId": new_product[5]
+                    }
+                }
+            }, status=201)
+
+        return Response({
+            "success": False,
+            "message": "Failed to create product"
+        }, status=400)
+
+    def get(self, request):
+        data = []
+        rows = getFromDB("""SELECT ProductId, Name, PackagingType, Weight, CategoryId, SupplierId FROM Product""", ())
+        for row in rows:
+            data.append({
+                "ProductId": row[0],
+                "Name": row[1],
+                "PackagingType": row[2],
+                "Weight": row[3],
+                "CategoryId": row[4],
+                "SupplierId": row[5]
+            })
+        return Response({
+            "success": True,
+            "message": "Product data fetched successfully",
+            "data": {"Products": data}
+        }, status=200)
+
+    def put(self, request, product_id):
+        data = request.data
+        update_query = """
+            UPDATE Product 
+            SET Name = %s, PackagingType = %s, Weight = %s, CategoryId = %s, SupplierId = %s
+            WHERE ProductId = %s
+        """
+        result, exception = postToDB(update_query, (
+            data.get("Name"),
+            data.get("PackagingType"),
+            data.get("Weight"),
+            data.get("CategoryId"),
+            data.get("SupplierId"),
+            product_id
+        ))
+
+        if exception:
+            return Response({
+                "success": False,
+                "message": str(exception)
+            }, status=500)
+
+        if result:
+            rows = getFromDB("""SELECT * FROM Product WHERE ProductId = %s""", (product_id,))
+            updated_product = rows[0]
+            return Response({
+                "success": True,
+                "message": "Product updated successfully",
+                "data": {
+                    "Product": {
+                        "ProductId": updated_product[0],
+                        "Name": updated_product[1],
+                        "PackagingType": updated_product[2],
+                        "Weight": updated_product[3],
+                        "CategoryId": updated_product[4],
+                        "SupplierId": updated_product[5]
+                    }
+                }
+            }, status=200)
+        else:
+            return Response({
+                "success": False,
+                "message": "Failed to update product"
+            }, status=400)
+
+    def delete(self, request, product_id):
+        result, exception = deleteFromDB("DELETE FROM Product WHERE ProductId = %s", (product_id,))
+        if exception:
+            return Response({
+                "success": False,
+                "message": str(exception)
+            }, status=500)
+        else:
+            if result:
+                return Response({
+                    "success": True,
+                    "message": "Product deleted successfully"
+                }, status=200)
+            else:
+                return Response({
+                    "success": False,
+                    "message": "Product not found"
+                }, status=404)
+
+class AdminAdministerPromotionalOfferView(APIView):
+    def post(self, request):
+        data = request.data
+        result, exception = postToDB("""
+            INSERT INTO PromotionalOffer(PromotionalOfferId, StartDate, EndDate, DiscountRate)
+            VALUES (%s, %s, %s, %s)
+        """, (
+            data.get("PromotionalOfferId"),
+            data.get("StartDate"),
+            data.get("EndDate"),
+            data.get("DiscountRate")
+        ))
+
+        if exception:
+            return Response({
+                "success": False,
+                "message": str(exception)
+            }, status=500)
+
+        if result:
+            rows = getFromDB("""SELECT * FROM PromotionalOffer WHERE PromotionalOfferId = %s""", (data.get("PromotionalOfferId"),))
+            new_offer = rows[0]
+            return Response({
+                "success": True,
+                "message": "Promotional offer created successfully",
+                "data": {
+                    "PromotionalOffer": {
+                        "PromotionalOfferId": new_offer[0],
+                        "StartDate": new_offer[1],
+                        "EndDate": new_offer[2],
+                        "DiscountRate": new_offer[3]
+                    }
+                }
+            }, status=201)
+
+        return Response({
+            "success": False,
+            "message": "Failed to create promotional offer"
+        }, status=400)
+
+    def get(self, request):
+        data = []
+        rows = getFromDB("""SELECT PromotionalOfferId, StartDate, EndDate, DiscountRate FROM PromotionalOffer""", ())
+        for row in rows:
+            data.append({
+                "PromotionalOfferId": row[0],
+                "StartDate": row[1],
+                "EndDate": row[2],
+                "DiscountRate": row[3]
+            })
+        return Response({
+            "success": True,
+            "message": "Promotional offer data fetched successfully",
+            "data": {"PromotionalOffers": data}
+        }, status=200)
+
+    def put(self, request, promotional_offer_id):
+        data = request.data
+        update_query = """
+            UPDATE PromotionalOffer 
+            SET StartDate = %s, EndDate = %s, DiscountRate = %s
+            WHERE PromotionalOfferId = %s
+        """
+        result, exception = postToDB(update_query, (
+            data.get("StartDate"),
+            data.get("EndDate"),
+            data.get("DiscountRate"),
+            promotional_offer_id
+        ))
+
+        if exception:
+            return Response({
+                "success": False,
+                "message": str(exception)
+            }, status=500)
+
+        if result:
+            rows = getFromDB("""SELECT * FROM PromotionalOffer WHERE PromotionalOfferId = %s""",
+                             (promotional_offer_id,))
+            updated_offer = rows[0]
+            return Response({
+                "success": True,
+                "message": "Promotional offer updated successfully",
+                "data": {
+                    "PromotionalOffer": {
+                        "PromotionalOfferId": updated_offer[0],
+                        "StartDate": updated_offer[1],
+                        "EndDate": updated_offer[2],
+                        "DiscountRate": updated_offer[3]
+                    }
+                }
+            }, status=200)
+        else:
+            return Response({
+                "success": False,
+                "message": "Failed to update promotional offer"
+            }, status=400)
+
+    def delete(self, request, promotional_offer_id):
+        result, exception = deleteFromDB("DELETE FROM PromotionalOffer WHERE PromotionalOfferId = %s",
+                                         (promotional_offer_id,))
+        if exception:
+            return Response({
+                "success": False,
+                "message": str(exception)
+            }, status=500)
+        else:
+            if result:
+                return Response({
+                    "success": True,
+                    "message": "Promotional offer deleted successfully"
+                }, status=200)
+            else:
+                return Response({
+                    "success": False,
+                    "message": "Promotional offer not found"
+                }, status=404)
