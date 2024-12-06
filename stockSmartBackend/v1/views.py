@@ -166,6 +166,26 @@ class AdminAdministerInventoryView(APIView):
         ))
 
         if exception:
+            if 'Duplicate' in exception:
+                return Response({
+                    "success": False,
+                    "message": "User with this email id already exists"
+                }, status=500)
+            if 'chk_inventory_dates' in exception:
+                return Response({
+                    "success": False,
+                    "message": "Please enter correct dates. ManufactureDate <= StockDate AND ManufactureDate <= ExpiryDate AND StockDate <= ExpiryDate"
+                }, status=400)
+            if 'chk_quantity' in exception:
+                return Response({
+                    "success": False,
+                "message": "Please enter correct quantity. Quantity cannot be negative"
+                }, status=400)
+            if 'chk_unitprice' in exception:
+                return Response({
+                    "success": False,
+                "message": "Please enter correct price. Price cannot be negative"
+                }, status=400)
             return Response({
                 "success": False,
                 "message": str(exception)
@@ -294,6 +314,11 @@ class AdminAdministerSupplierView(APIView):
         ))
 
         if exception:
+            if 'Duplicate' in exception:
+                return Response({
+                    "success": False,
+                    "message": "Supplier With this SupplierId already exists"
+                }, status=500)
             return Response({
                 "success": False,
                 "message": str(exception)
@@ -407,6 +432,11 @@ class AdminAdministerCategoryView(APIView):
         ))
 
         if exception:
+            if 'Duplicate' in exception:
+                return Response({
+                    "success": False,
+                    "message": "Category with this CategoryId already exists"
+                }, status=500)
             return Response({
                 "success": False,
                 "message": str(exception)
@@ -525,6 +555,11 @@ class AdminAdministerProductView(APIView):
         ))
 
         if exception:
+            if 'Duplicate' in exception:
+                return Response({
+                    "success": False,
+                    "message": "Product with this ProductId already exists"
+                }, status=500)
             return Response({
                 "success": False,
                 "message": str(exception)
@@ -649,6 +684,11 @@ class AdminAdministerPromotionalOfferView(APIView):
         ))
 
         if exception:
+            if 'Duplicate' in exception:
+                return Response({
+                    "success": False,
+                    "message": "PromotionalOffer with this PromotionalOffer already exists"
+                }, status=500)
             return Response({
                 "success": False,
                 "message": str(exception)
