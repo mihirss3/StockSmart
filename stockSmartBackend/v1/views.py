@@ -1,6 +1,6 @@
-from rest_framework.response import Response
 from rest_framework.views import APIView
 from v1.utils.db_utils import *
+from v1.utils.response_utils import *
 
 
 class IndexView(APIView):
@@ -33,81 +33,28 @@ class AdminAdministerUserView(APIView):
                  "VALUES(%s, %s, %s,%s, %s, %s)",
                  (data.get("EmailId"), data.get("Password"), data.get("Type"),data.get("FirstName"),data.get("LastName"), data.get("PhoneNumber")))
         if exception:
-            if 'Duplicate' in exception:
-                return Response({
-                    "success": False,
-                    "message": "User with this email id already exists"
-                }, status=500)
-            if 'chk_email_format' in exception:
-                return Response({
-                    "success": False,
-                    "message": "Please enter correct email"
-                }, status=400)
-            if 'chk_password_complexity' in exception:
-                return Response({
-                    "success": False,
-                    "message": "Please enter correct password. It must be at least 6 characters long and contain at least one digit, one uppercase and one lowercase letter"
-                }, status=400)
+            return handleExceptionResponse(exception)
         if result:
             rows = getFromDB("""SELECT * FROM User WHERE UserId = %s""", (userId,))
-            newUser = rows[0]
-            return Response({
-                "success": True,
-                "message": "New user created successfully",
-                "data": {
-                    "User": {
-                        "UserId": newUser[0],
-                        "EmailId": newUser[1],
-                        "Password": newUser[2],
-                        "Type": newUser[3],
-                        "FirstName": newUser[4],
-                        "LastName": newUser[5],
-                        "PhoneNumber": newUser[6]
-                    }
-                }
-            }, status=201)
-        else:
-            return Response({
-                "success": False,
-                "message": "New user was not created, please check your input"
-            }, status=400)
+            row = rows[0]
+            newUser = {"UserId": row[0], "EmailId": row[1], "Password": row[2], "Type": row[3], "FirstName": row[4], "LastName": row[5], "PhoneNumber": row[6]}
+            return handlePostResponse(newUser)
+        return handleExceptionResponse(None)
 
     def get(self, request):
-        data = []
         rows = getFromDB("""SELECT EmailId, FirstName, LastName, PhoneNumber FROM User WHERE Type='Analyst'""",())
-        for row in rows:
-            data.append({
-                "EmailId" : row[0],
-                "FirstName": row[1],
-                "LastName": row[2],
-                "PhoneNumber": row[3]
-            })
-        return Response({
-            "success": True,
-            "message": "New user created successfully",
-            "data": {
-                "Users": data
-            }
-        }, status=200)
+        data = [
+            {"EmailId": row[0], "FirstName": row[1], "LastName": row[2], "PhoneNumber": row[3]}
+            for row in rows
+        ]
+        return handleGetResponse(data)
 
     def delete(self, request, emailId):
         result, exception = deleteFromDB("DELETE FROM User WHERE EmailId = %s", (emailId,))
         if exception:
-            return Response({
-                "success": False,
-                "message": exception
-            }, status=500)
+            return handleExceptionResponse(exception)
         else:
-            if result:
-                return Response({
-                    "success": True,
-                    "message": "User deleted successfully"
-                }, status=200)
-            else:
-                return Response({
-                    "success": False,
-                    "message": "User not found"
-                }, status=404)
+            return handleDeleteResponse(result)
 
     def put(self, request, emailId):
         data = request.data
@@ -120,34 +67,16 @@ class AdminAdministerUserView(APIView):
             data.get("Type"), data.get("FirstName"), data.get("LastName"), data.get("PhoneNumber"),emailId
         ))
         if exception:
-            return Response({
-                "success": False,
-                "message": exception
-            }, status=500)
+            return handleExceptionResponse(exception)
         else:
             if result:
                 rows = getFromDB("""SELECT * FROM User WHERE EmailId = %s""", (emailId,))
-                updated_user = rows[0]
-                return Response({
-                    "success": True,
-                    "message": "User updated successfully",
-                    "data": {
-                        "User": {
-                            "UserId": updated_user[0],
-                            "EmailId": updated_user[1],
-                            "Password": updated_user[2],
-                            "Type": updated_user[3],
-                            "FirstName": updated_user[4],
-                            "LastName": updated_user[5],
-                            "PhoneNumber": updated_user[6]
-                        }
-                    }
-                }, status=200)
+                row = rows[0]
+                updated_user = {"UserId": row[0], "EmailId": row[1], "Type": row[3], "FirstName": row[4],
+                           "LastName": row[5], "PhoneNumber": row[6]}
+                return handlePutResponse(updated_user)
             else:
-                return Response({
-                    "success": False,
-                    "message": "Failed to update user"
-                }, status=400)
+                return handlePutResponse(None)
 
 class AdminAdministerInventoryView(APIView):
     def post(self, request):
@@ -165,73 +94,20 @@ class AdminAdministerInventoryView(APIView):
         ))
 
         if exception:
-            if 'Duplicate' in exception:
-                return Response({
-                    "success": False,
-                    "message": "User with this email id already exists"
-                }, status=500)
-            if 'chk_inventory_dates' in exception:
-                return Response({
-                    "success": False,
-                    "message": "Please enter correct dates. ManufactureDate <= StockDate AND ManufactureDate <= ExpiryDate AND StockDate <= ExpiryDate"
-                }, status=400)
-            if 'chk_quantity' in exception:
-                return Response({
-                    "success": False,
-                "message": "Please enter correct quantity. Quantity cannot be negative"
-                }, status=400)
-            if 'chk_unitprice' in exception:
-                return Response({
-                    "success": False,
-                "message": "Please enter correct price. Price cannot be negative"
-                }, status=400)
-            return Response({
-                "success": False,
-                "message": str(exception)
-            }, status=500)
-
+            return handleExceptionResponse(exception)
         if result:
             rows = getFromDB("""SELECT * FROM Inventory WHERE InventoryId = %s""", (inventoryId,))
             new_inventory = rows[0]
-            return Response({
-                "success": True,
-                "message": "Inventory created successfully",
-                "data": {
-                    "Inventory": {
-                        "InventoryId": new_inventory[0],
-                        "StockDate": new_inventory[1],
-                        "ProductId": new_inventory[2],
-                        "UnitPrice": new_inventory[3],
-                        "ManufactureDate": new_inventory[4],
-                        "ExpiryDate": new_inventory[5],
-                        "Quantity": new_inventory[6]
-                    }
-                }
-            }, status=201)
-
-        return Response({
-            "success": False,
-            "message": "Failed to create inventory"
-        }, status=400)
+            return handlePostResponse(new_inventory)
+        return handleExceptionResponse(None)
 
     def get(self, request):
-        data = []
         rows = getFromDB("""SELECT * FROM Inventory""", ())
-        for row in rows:
-            data.append({
-                "InventoryId": row[0],
-                "StockDate": row[1],
-                "ProductId": row[2],
-                "UnitPrice": row[3],
-                "ManufactureDate": row[4],
-                "ExpiryDate": row[5],
-                "Quantity": row[6]
-            })
-        return Response({
-            "success": True,
-            "message": "Inventory data fetched successfully",
-            "data": {"Inventory": data}
-        }, status=200)
+        data = [
+            {"InventoryId": row[0],"StockDate": row[1],"ProductId": row[2],"UnitPrice": row[3],"ManufactureDate": row[4],"ExpiryDate": row[5],"Quantity": row[6]}
+            for row in rows
+        ]
+        return handleGetResponse(data)
 
     def put(self, request, inventory_id):
         data = request.data
@@ -251,53 +127,21 @@ class AdminAdministerInventoryView(APIView):
         ))
 
         if exception:
-            return Response({
-                "success": False,
-                "message": str(exception)
-            }, status=500)
-
+            return handleExceptionResponse(exception)
         if result:
             rows = getFromDB("""SELECT * FROM Inventory WHERE InventoryId = %s""", (inventory_id,))
             updated_inventory = rows[0]
-            return Response({
-                "success": True,
-                "message": "Inventory updated successfully",
-                "data": {
-                    "Inventory": {
-                        "InventoryId": updated_inventory[0],
-                        "StockDate": updated_inventory[1],
-                        "ProductId": updated_inventory[2],
-                        "UnitPrice": updated_inventory[3],
-                        "ManufactureDate": updated_inventory[4],
-                        "ExpiryDate": updated_inventory[5],
-                        "Quantity": updated_inventory[6]
-                    }
-                }
-            }, status=200)
+            return handlePutResponse(updated_inventory)
+
         else:
-            return Response({
-                "success": False,
-                "message": "Failed to update inventory"
-            }, status=400)
+            return handlePutResponse(None)
 
     def delete(self, request, inventory_id):
         result, exception = deleteFromDB("DELETE FROM Inventory WHERE InventoryId = %s", (inventory_id,))
         if exception:
-            return Response({
-                "success": False,
-                "message": str(exception)
-            }, status=500)
+            return handleExceptionResponse(exception)
         else:
-            if result:
-                return Response({
-                    "success": True,
-                    "message": "Inventory deleted successfully"
-                }, status=200)
-            else:
-                return Response({
-                    "success": False,
-                    "message": "Inventory not found"
-                }, status=404)
+            return handleDeleteResponse(result)
 
 class AdminAdministerSupplierView(APIView):
     def post(self, request):
@@ -312,52 +156,21 @@ class AdminAdministerSupplierView(APIView):
         ))
 
         if exception:
-            if 'Duplicate' in exception:
-                return Response({
-                    "success": False,
-                    "message": "Supplier With this SupplierId already exists"
-                }, status=500)
-            return Response({
-                "success": False,
-                "message": str(exception)
-            }, status=500)
-
+            return handleExceptionResponse(exception)
         if result:
             rows = getFromDB("""SELECT * FROM Supplier WHERE SupplierId = %s""", (supplierId,))
-            new_supplier = rows[0]
-            return Response({
-                "success": True,
-                "message": "Supplier created successfully",
-                "data": {
-                    "Supplier": {
-                        "SupplierId": new_supplier[0],
-                        "Name": new_supplier[1],
-                        "Address": new_supplier[2],
-                        "Contact": new_supplier[3]
-                    }
-                }
-            }, status=201)
-
-        return Response({
-            "success": False,
-            "message": "Failed to create supplier"
-        }, status=400)
+            row = rows[0]
+            new_supplier = {"SupplierId": row[0],"Name": row[1],"Address": row[2],"Contact": row[3]}
+            return handlePostResponse(new_supplier)
+        return handleExceptionResponse(None)
 
     def get(self, request):
-        data = []
         rows = getFromDB("""SELECT SupplierId, Name, Address, Contact FROM Supplier""", ())
-        for row in rows:
-            data.append({
-                "SupplierId": row[0],
-                "Name": row[1],
-                "Address": row[2],
-                "Contact": row[3]
-            })
-        return Response({
-            "success": True,
-            "message": "Supplier data fetched successfully",
-            "data": {"Suppliers": data}
-        }, status=200)
+        data = [
+            {"SupplierId": row[0],"Name": row[1],"Address": row[2],"Contact": row[3]}
+            for row in rows
+        ]
+        return handleGetResponse(data)
 
     def put(self, request, supplier_id):
         data = request.data
@@ -371,50 +184,22 @@ class AdminAdministerSupplierView(APIView):
         ))
 
         if exception:
-            return Response({
-                "success": False,
-                "message": str(exception)
-            }, status=500)
+            return handleExceptionResponse(exception)
 
         if result:
             rows = getFromDB("""SELECT * FROM Supplier WHERE SupplierId = %s""", (supplier_id,))
-            updated_supplier = rows[0]
-            return Response({
-                "success": True,
-                "message": "Supplier updated successfully",
-                "data": {
-                    "Supplier": {
-                        "SupplierId": updated_supplier[0],
-                        "Name": updated_supplier[1],
-                        "Address": updated_supplier[2],
-                        "Contact": updated_supplier[3]
-                    }
-                }
-            }, status=200)
+            row = rows[0]
+            updated_supplier = {"SupplierId": row[0],"Name": row[1],"Address": row[2],"Contact": row[3]}
+            return handlePutResponse(updated_supplier)
         else:
-            return Response({
-                "success": False,
-                "message": "Failed to update supplier"
-            }, status=400)
+            return handlePutResponse(None)
 
     def delete(self, request, supplier_id):
         result, exception = deleteFromDB("DELETE FROM Supplier WHERE SupplierId = %s", (supplier_id,))
         if exception:
-            return Response({
-                "success": False,
-                "message": str(exception)
-            }, status=500)
+            return handleExceptionResponse(exception)
         else:
-            if result:
-                return Response({
-                    "success": True,
-                    "message": "Supplier deleted successfully"
-                }, status=200)
-            else:
-                return Response({
-                    "success": False,
-                    "message": "Supplier not found"
-                }, status=404)
+            return handleDeleteResponse(result)
 
 class AdminAdministerCategoryView(APIView):
     def post(self, request):
@@ -429,52 +214,23 @@ class AdminAdministerCategoryView(APIView):
         ))
 
         if exception:
-            if 'Duplicate' in exception:
-                return Response({
-                    "success": False,
-                    "message": "Category with this CategoryId already exists"
-                }, status=500)
-            return Response({
-                "success": False,
-                "message": str(exception)
-            }, status=500)
+            return handleExceptionResponse(exception)
 
         if result:
             rows = getFromDB("""SELECT * FROM Category WHERE CategoryId = %s""", (categoryId,))
-            new_category = rows[0]
-            return Response({
-                "success": True,
-                "message": "Category created successfully",
-                "data": {
-                    "Category": {
-                        "CategoryId": new_category[0],
-                        "Name": new_category[1],
-                        "LeadTime": new_category[2],
-                        "StorageRequirements": new_category[3]
-                    }
-                }
-            }, status=201)
+            row = rows[0]
+            new_category = [{"CategoryId": row[0],"Name": row[1],"LeadTime": row[2],"StorageRequirements": row[3]}]
+            return handlePostResponse(new_category)
 
-        return Response({
-            "success": False,
-            "message": "Failed to create category"
-        }, status=400)
+        return handleExceptionResponse(None)
 
     def get(self, request):
-        data = []
         rows = getFromDB("""SELECT CategoryId, Name, LeadTime, StorageRequirements FROM Category""", ())
-        for row in rows:
-            data.append({
-                "CategoryId": row[0],
-                "Name": row[1],
-                "LeadTime": row[2],
-                "StorageRequirements": row[3]
-            })
-        return Response({
-            "success": True,
-            "message": "Category data fetched successfully",
-            "data": {"Categories": data}
-        }, status=200)
+        data = [
+            {"CategoryId": row[0],"Name": row[1],"LeadTime": row[2],"StorageRequirements": row[3]}
+            for row in rows
+        ]
+        return handleGetResponse(data)
 
     def put(self, request, category_id):
         data = request.data
@@ -489,52 +245,22 @@ class AdminAdministerCategoryView(APIView):
             data.get("StorageRequirements"),
             category_id
         ))
-
         if exception:
-            return Response({
-                "success": False,
-                "message": str(exception)
-            }, status=500)
-
+            return handleExceptionResponse(exception)
         if result:
             rows = getFromDB("""SELECT * FROM Category WHERE CategoryId = %s""", (category_id,))
-            updated_category = rows[0]
-            return Response({
-                "success": True,
-                "message": "Category updated successfully",
-                "data": {
-                    "Category": {
-                        "CategoryId": updated_category[0],
-                        "Name": updated_category[1],
-                        "LeadTime": updated_category[2],
-                        "StorageRequirements": updated_category[3]
-                    }
-                }
-            }, status=200)
+            row = rows[0]
+            updated_category = {"CategoryId": row[0],"Name": row[1],"LeadTime": row[2],"StorageRequirements": row[3]}
+            return handlePutResponse(updated_category)
         else:
-            return Response({
-                "success": False,
-                "message": "Failed to update category"
-            }, status=400)
+            return handlePutResponse(None)
 
     def delete(self, request, category_id):
         result, exception = deleteFromDB("DELETE FROM Category WHERE CategoryId = %s", (category_id,))
         if exception:
-            return Response({
-                "success": False,
-                "message": str(exception)
-            }, status=500)
+            return handleExceptionResponse(exception)
         else:
-            if result:
-                return Response({
-                    "success": True,
-                    "message": "Category deleted successfully"
-                }, status=200)
-            else:
-                return Response({
-                    "success": False,
-                    "message": "Category not found"
-                }, status=404)
+            return handleDeleteResponse(result)
 
 class AdminAdministerProductView(APIView):
     def post(self, request):
@@ -551,56 +277,22 @@ class AdminAdministerProductView(APIView):
         ))
 
         if exception:
-            if 'Duplicate' in exception:
-                return Response({
-                    "success": False,
-                    "message": "Product with this ProductId already exists"
-                }, status=500)
-            return Response({
-                "success": False,
-                "message": str(exception)
-            }, status=500)
+            return handleExceptionResponse(exception)
 
         if result:
             rows = getFromDB("""SELECT * FROM Product WHERE ProductId = %s""", (productId,))
-            new_product = rows[0]
-            return Response({
-                "success": True,
-                "message": "Product created successfully",
-                "data": {
-                    "Product": {
-                        "ProductId": new_product[0],
-                        "Name": new_product[1],
-                        "PackagingType": new_product[2],
-                        "Weight": new_product[3],
-                        "CategoryId": new_product[4],
-                        "SupplierId": new_product[5]
-                    }
-                }
-            }, status=201)
-
-        return Response({
-            "success": False,
-            "message": "Failed to create product"
-        }, status=400)
+            row = rows[0]
+            new_product = {"ProductId": row[0],"Name": row[1],"PackagingType": row[2],"Weight": row[3],"CategoryId": row[4],"SupplierId": row[5]}
+            return handlePostResponse(new_product)
+        return handleExceptionResponse(None)
 
     def get(self, request):
-        data = []
         rows = getFromDB("""SELECT ProductId, Name, PackagingType, Weight, CategoryId, SupplierId FROM Product""", ())
-        for row in rows:
-            data.append({
-                "ProductId": row[0],
-                "Name": row[1],
-                "PackagingType": row[2],
-                "Weight": row[3],
-                "CategoryId": row[4],
-                "SupplierId": row[5]
-            })
-        return Response({
-            "success": True,
-            "message": "Product data fetched successfully",
-            "data": {"Products": data}
-        }, status=200)
+        data = [
+            {"ProductId": row[0],"Name": row[1],"PackagingType": row[2],"Weight": row[3],"CategoryId": row[4],"SupplierId": row[5]}
+            for row in rows
+        ]
+        return handleGetResponse(data)
 
     def put(self, request, product_id):
         data = request.data
@@ -619,52 +311,21 @@ class AdminAdministerProductView(APIView):
         ))
 
         if exception:
-            return Response({
-                "success": False,
-                "message": str(exception)
-            }, status=500)
-
+            return handleExceptionResponse(exception)
         if result:
             rows = getFromDB("""SELECT * FROM Product WHERE ProductId = %s""", (product_id,))
-            updated_product = rows[0]
-            return Response({
-                "success": True,
-                "message": "Product updated successfully",
-                "data": {
-                    "Product": {
-                        "ProductId": updated_product[0],
-                        "Name": updated_product[1],
-                        "PackagingType": updated_product[2],
-                        "Weight": updated_product[3],
-                        "CategoryId": updated_product[4],
-                        "SupplierId": updated_product[5]
-                    }
-                }
-            }, status=200)
+            row = rows[0]
+            updated_product = {"ProductId": row[0],"Name": row[1],"PackagingType": row[2],"Weight": row[3], "CategoryId": row[4],"SupplierId": row[5]}
+            return handlePutResponse(updated_product)
         else:
-            return Response({
-                "success": False,
-                "message": "Failed to update product"
-            }, status=400)
+            return handlePutResponse(None)
 
     def delete(self, request, product_id):
         result, exception = deleteFromDB("DELETE FROM Product WHERE ProductId = %s", (product_id,))
         if exception:
-            return Response({
-                "success": False,
-                "message": str(exception)
-            }, status=500)
+            return handleExceptionResponse(exception)
         else:
-            if result:
-                return Response({
-                    "success": True,
-                    "message": "Product deleted successfully"
-                }, status=200)
-            else:
-                return Response({
-                    "success": False,
-                    "message": "Product not found"
-                }, status=404)
+            return handleDeleteResponse(result)
 
 class AdminAdministerPromotionalOfferView(APIView):
     def post(self, request):
@@ -679,52 +340,23 @@ class AdminAdministerPromotionalOfferView(APIView):
         ))
 
         if exception:
-            if 'Duplicate' in exception:
-                return Response({
-                    "success": False,
-                    "message": "PromotionalOffer with this PromotionalOffer already exists"
-                }, status=500)
-            return Response({
-                "success": False,
-                "message": str(exception)
-            }, status=500)
+            return handleExceptionResponse(exception)
 
         if result:
             rows = getFromDB("""SELECT * FROM PromotionalOffer WHERE PromotionalOfferId = %s""", (promotionalOfferId,))
-            new_offer = rows[0]
-            return Response({
-                "success": True,
-                "message": "Promotional offer created successfully",
-                "data": {
-                    "PromotionalOffer": {
-                        "PromotionalOfferId": new_offer[0],
-                        "StartDate": new_offer[1],
-                        "EndDate": new_offer[2],
-                        "DiscountRate": new_offer[3]
-                    }
-                }
-            }, status=201)
+            row = rows[0]
+            new_offer = {"PromotionalOfferId": row[0],"StartDate": row[1],"EndDate": row[2],"DiscountRate": row[3]}
+            return handlePostResponse(new_offer)
 
-        return Response({
-            "success": False,
-            "message": "Failed to create promotional offer"
-        }, status=400)
+        return handleExceptionResponse(exception)
 
     def get(self, request):
-        data = []
         rows = getFromDB("""SELECT PromotionalOfferId, StartDate, EndDate, DiscountRate FROM PromotionalOffer""", ())
-        for row in rows:
-            data.append({
-                "PromotionalOfferId": row[0],
-                "StartDate": row[1],
-                "EndDate": row[2],
-                "DiscountRate": row[3]
-            })
-        return Response({
-            "success": True,
-            "message": "Promotional offer data fetched successfully",
-            "data": {"PromotionalOffers": data}
-        }, status=200)
+        data = [
+            {"PromotionalOfferId": row[0],"StartDate": row[1],"EndDate": row[2],"DiscountRate": row[3]}
+            for row in rows
+        ]
+        return handleGetResponse(data)
 
     def put(self, request, promotional_offer_id):
         data = request.data
@@ -741,49 +373,21 @@ class AdminAdministerPromotionalOfferView(APIView):
         ))
 
         if exception:
-            return Response({
-                "success": False,
-                "message": str(exception)
-            }, status=500)
+            return handleExceptionResponse(exception)
 
         if result:
             rows = getFromDB("""SELECT * FROM PromotionalOffer WHERE PromotionalOfferId = %s""",
                              (promotional_offer_id,))
-            updated_offer = rows[0]
-            return Response({
-                "success": True,
-                "message": "Promotional offer updated successfully",
-                "data": {
-                    "PromotionalOffer": {
-                        "PromotionalOfferId": updated_offer[0],
-                        "StartDate": updated_offer[1],
-                        "EndDate": updated_offer[2],
-                        "DiscountRate": updated_offer[3]
-                    }
-                }
-            }, status=200)
+            row = rows[0]
+            updated_offer = {"PromotionalOfferId": row[0],"StartDate": row[1],"EndDate": row[2],"DiscountRate": row[3]}
+            return handlePutResponse(updated_offer)
         else:
-            return Response({
-                "success": False,
-                "message": "Failed to update promotional offer"
-            }, status=400)
+            return handlePutResponse(None)
 
     def delete(self, request, promotional_offer_id):
         result, exception = deleteFromDB("DELETE FROM PromotionalOffer WHERE PromotionalOfferId = %s",
                                          (promotional_offer_id,))
         if exception:
-            return Response({
-                "success": False,
-                "message": str(exception)
-            }, status=500)
+            return handleExceptionResponse(exception)
         else:
-            if result:
-                return Response({
-                    "success": True,
-                    "message": "Promotional offer deleted successfully"
-                }, status=200)
-            else:
-                return Response({
-                    "success": False,
-                    "message": "Promotional offer not found"
-                }, status=404)
+            return handleDeleteResponse(result)
