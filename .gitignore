@@ -1,22 +1,6 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# frontend
-/stock-smart-frontend/node_modules
-/stock-smart-frontend/.pnp
-/stock-smart-frontend/.pnp.js
-/stock-smart-frontend/coverage
-/stock-smart-frontend/build
-/stock-smart-frontend/.DS_Store
-/stock-smart-frontend/.env.local
-/stock-smart-frontend/.env.development.local
-/stock-smart-frontend/.env.test.local
-/stock-smart-frontend/.env.production.local
-
-/stock-smart-frontend/npm-debug.log*
-/stock-smart-frontend/yarn-debug.log*
-/stock-smart-frontend/yarn-error.log*
-
-# backend
-
-
+# IDE-specific files
+.idea/
+.vscode/
 

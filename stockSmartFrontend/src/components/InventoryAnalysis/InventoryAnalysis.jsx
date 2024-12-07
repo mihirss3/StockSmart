@@ -81,9 +81,9 @@ const InventoryAnalysis = () => {
        </table>
      )}
       </div>
-     
+
     </div>
- 
+
   );
 };
 
