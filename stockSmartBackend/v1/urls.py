@@ -9,7 +9,7 @@ urlpatterns = [
     path('administrator/administer/user/<str:emailId>', AdminAdministerUserView.as_view(), name='adminAdministerUser1'),
 
     path('administrator/administer/inventory', AdminAdministerInventoryView.as_view(), name='adminAdministerInventory'),
-    path('administrator/administer/inventory/<str:emailId>', AdminAdministerInventoryView.as_view(), name='adminAdministerInventory1'),
+    path('administrator/administer/inventory/<str:inventory_id>', AdminAdministerInventoryView.as_view(), name='adminAdministerInventory1'),
 
     path('administrator/administer/supplier', AdminAdministerSupplierView.as_view(), name='adminAdministerSupplier'),
     path('administrator/administer/supplier/<int:supplier_id>', AdminAdministerSupplierView.as_view(), name='adminAdministerSupplier1'),

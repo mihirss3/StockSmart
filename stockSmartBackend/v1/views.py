@@ -29,9 +29,9 @@ class LoginView(APIView):
 class AdminAdministerUserView(APIView):
     def post(self, request):
         data = request.data
-        result, exception = postToDB("INSERT INTO User(EmailId, Password, Type, FirstName, LastName, PhoneNumber) "
+        result, exception, userId = postToDB("INSERT INTO User(EmailId, Password, Type, FirstName, LastName, PhoneNumber) "
                  "VALUES(%s, %s, %s,%s, %s, %s)",
-                 (data.get("emailId"), data.get("password"), data.get("type"),data.get("firstName"),data.get("lastName"), data.get("phoneNumber")))
+                 (data.get("EmailId"), data.get("Password"), data.get("Type"),data.get("FirstName"),data.get("LastName"), data.get("PhoneNumber")))
         if exception:
             if 'Duplicate' in exception:
                 return Response({
@@ -49,7 +49,7 @@ class AdminAdministerUserView(APIView):
                     "message": "Please enter correct password. It must be at least 6 characters long and contain at least one digit, one uppercase and one lowercase letter"
                 }, status=400)
         if result:
-            rows = getFromDB("""SELECT * FROM User WHERE emailId = %s""", (data.get("emailId"),))
+            rows = getFromDB("""SELECT * FROM User WHERE UserId = %s""", (userId,))
             newUser = rows[0]
             return Response({
                 "success": True,
@@ -116,7 +116,7 @@ class AdminAdministerUserView(APIView):
                     SET Type = %s, FirstName = %s, LastName = %s, PhoneNumber = %s
                     WHERE EmailId = %s
                 """
-        result, exception = postToDB(update_query, (
+        result, exception, lastUpdatedRowId = postToDB(update_query, (
             data.get("Type"), data.get("FirstName"), data.get("LastName"), data.get("PhoneNumber"),emailId
         ))
         if exception:
@@ -152,11 +152,10 @@ class AdminAdministerUserView(APIView):
 class AdminAdministerInventoryView(APIView):
     def post(self, request):
         data = request.data
-        result, exception = postToDB("""
-            INSERT INTO Inventory(InventoryId, StockDate, ProductId, UnitPrice, ManufactureDate, ExpiryDate, Quantity)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        result, exception, inventoryId = postToDB("""
+            INSERT INTO Inventory(StockDate, ProductId, UnitPrice, ManufactureDate, ExpiryDate, Quantity)
+            VALUES (%s, %s, %s, %s, %s, %s)
         """, (
-            data.get("InventoryId"),
             data.get("StockDate"),
             data.get("ProductId"),
             data.get("UnitPrice"),
@@ -192,7 +191,7 @@ class AdminAdministerInventoryView(APIView):
             }, status=500)
 
         if result:
-            rows = getFromDB("""SELECT * FROM Inventory WHERE InventoryId = %s""", (data.get("InventoryId"),))
+            rows = getFromDB("""SELECT * FROM Inventory WHERE InventoryId = %s""", (inventoryId,))
             new_inventory = rows[0]
             return Response({
                 "success": True,
@@ -241,7 +240,7 @@ class AdminAdministerInventoryView(APIView):
             SET StockDate = %s, ProductId = %s, UnitPrice = %s, ManufactureDate = %s, ExpiryDate = %s, Quantity = %s
             WHERE InventoryId = %s
         """
-        result, exception = postToDB(update_query, (
+        result, exception, lastUpdatedRowId = postToDB(update_query, (
             data.get("StockDate"),
             data.get("ProductId"),
             data.get("UnitPrice"),
@@ -303,11 +302,10 @@ class AdminAdministerInventoryView(APIView):
 class AdminAdministerSupplierView(APIView):
     def post(self, request):
         data = request.data
-        result, exception = postToDB("""
-            INSERT INTO Supplier(SupplierId, Name, Address, Contact)
-            VALUES (%s, %s, %s, %s)
+        result, exception, supplierId = postToDB("""
+            INSERT INTO Supplier(Name, Address, Contact)
+            VALUES (%s, %s, %s)
         """, (
-            data.get("SupplierId"),
             data.get("Name"),
             data.get("Address"),
             data.get("Contact")
@@ -325,7 +323,7 @@ class AdminAdministerSupplierView(APIView):
             }, status=500)
 
         if result:
-            rows = getFromDB("""SELECT * FROM Supplier WHERE SupplierId = %s""", (data.get("SupplierId"),))
+            rows = getFromDB("""SELECT * FROM Supplier WHERE SupplierId = %s""", (supplierId,))
             new_supplier = rows[0]
             return Response({
                 "success": True,
@@ -368,7 +366,7 @@ class AdminAdministerSupplierView(APIView):
             SET Name = %s, Address = %s, Contact = %s
             WHERE SupplierId = %s
         """
-        result, exception = postToDB(update_query, (
+        result, exception, lastUpdatedRowId = postToDB(update_query, (
             data.get("Name"), data.get("Address"), data.get("Contact"), supplier_id
         ))
 
@@ -421,11 +419,10 @@ class AdminAdministerSupplierView(APIView):
 class AdminAdministerCategoryView(APIView):
     def post(self, request):
         data = request.data
-        result, exception = postToDB("""
-            INSERT INTO Category(CategoryId, Name, LeadTime, StorageRequirements)
-            VALUES (%s, %s, %s, %s)
+        result, exception, categoryId = postToDB("""
+            INSERT INTO Category(Name, LeadTime, StorageRequirements)
+            VALUES (%s, %s, %s)
         """, (
-            data.get("CategoryId"),
             data.get("Name"),
             data.get("LeadTime"),
             data.get("StorageRequirements")
@@ -443,7 +440,7 @@ class AdminAdministerCategoryView(APIView):
             }, status=500)
 
         if result:
-            rows = getFromDB("""SELECT * FROM Category WHERE CategoryId = %s""", (data.get("CategoryId"),))
+            rows = getFromDB("""SELECT * FROM Category WHERE CategoryId = %s""", (categoryId,))
             new_category = rows[0]
             return Response({
                 "success": True,
@@ -486,7 +483,7 @@ class AdminAdministerCategoryView(APIView):
             SET Name = %s, LeadTime = %s, StorageRequirements = %s
             WHERE CategoryId = %s
         """
-        result, exception = postToDB(update_query, (
+        result, exception, lastUpdatedRowId = postToDB(update_query, (
             data.get("Name"),
             data.get("LeadTime"),
             data.get("StorageRequirements"),
@@ -542,11 +539,10 @@ class AdminAdministerCategoryView(APIView):
 class AdminAdministerProductView(APIView):
     def post(self, request):
         data = request.data
-        result, exception = postToDB("""
-            INSERT INTO Product(ProductId, Name, PackagingType, Weight, CategoryId, SupplierId)
-            VALUES (%s, %s, %s, %s, %s, %s)
+        result, exception, productId = postToDB("""
+            INSERT INTO Product(Name, PackagingType, Weight, CategoryId, SupplierId)
+            VALUES (%s, %s, %s, %s, %s)
         """, (
-            data.get("ProductId"),
             data.get("Name"),
             data.get("PackagingType"),
             data.get("Weight"),
@@ -566,7 +562,7 @@ class AdminAdministerProductView(APIView):
             }, status=500)
 
         if result:
-            rows = getFromDB("""SELECT * FROM Product WHERE ProductId = %s""", (data.get("ProductId"),))
+            rows = getFromDB("""SELECT * FROM Product WHERE ProductId = %s""", (productId,))
             new_product = rows[0]
             return Response({
                 "success": True,
@@ -613,7 +609,7 @@ class AdminAdministerProductView(APIView):
             SET Name = %s, PackagingType = %s, Weight = %s, CategoryId = %s, SupplierId = %s
             WHERE ProductId = %s
         """
-        result, exception = postToDB(update_query, (
+        result, exception, lastUpdatedRowId = postToDB(update_query, (
             data.get("Name"),
             data.get("PackagingType"),
             data.get("Weight"),
@@ -673,11 +669,10 @@ class AdminAdministerProductView(APIView):
 class AdminAdministerPromotionalOfferView(APIView):
     def post(self, request):
         data = request.data
-        result, exception = postToDB("""
-            INSERT INTO PromotionalOffer(PromotionalOfferId, StartDate, EndDate, DiscountRate)
-            VALUES (%s, %s, %s, %s)
+        result, exception, promotionalOfferId = postToDB("""
+            INSERT INTO PromotionalOffer(StartDate, EndDate, DiscountRate)
+            VALUES (%s, %s, %s)
         """, (
-            data.get("PromotionalOfferId"),
             data.get("StartDate"),
             data.get("EndDate"),
             data.get("DiscountRate")
@@ -695,7 +690,7 @@ class AdminAdministerPromotionalOfferView(APIView):
             }, status=500)
 
         if result:
-            rows = getFromDB("""SELECT * FROM PromotionalOffer WHERE PromotionalOfferId = %s""", (data.get("PromotionalOfferId"),))
+            rows = getFromDB("""SELECT * FROM PromotionalOffer WHERE PromotionalOfferId = %s""", (promotionalOfferId,))
             new_offer = rows[0]
             return Response({
                 "success": True,
@@ -738,7 +733,7 @@ class AdminAdministerPromotionalOfferView(APIView):
             SET StartDate = %s, EndDate = %s, DiscountRate = %s
             WHERE PromotionalOfferId = %s
         """
-        result, exception = postToDB(update_query, (
+        result, exception, lastUpdatedRowId = postToDB(update_query, (
             data.get("StartDate"),
             data.get("EndDate"),
             data.get("DiscountRate"),
