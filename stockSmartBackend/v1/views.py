@@ -752,3 +752,110 @@ class AdminAdministerPromotionalOfferView(APIView):
                     "success": False,
                     "message": "Promotional offer not found"
                 }, status=404)
+
+
+class fetchChartOneData(APIView):
+        def get():
+            data = []
+            rows = getFromDB("""SELECT prod.Name,SUM(inventory.Quantity) 
+                             FROM Inventory inventory INNER JOIN Product prod 
+                             ON inventory.ProductId=prod.ProductId
+                             GROUP BY 1""", ())
+            for row in rows:
+                data.append({
+                    "Product Name": row[0],
+                    "Quantity": row[1],
+                })
+            return Response({
+                "success": True,
+                "message": "Product Details and Quantity for Graph 1 data fetched successfully",
+                "data": {"Graph 1": data}
+            }, status=200)
+        
+class fetchChartTwoData(APIView):
+        def get():
+            data = []
+            rows = getFromDB("""
+                SELECT cat.Name,prod.Name,SUM(i.Quantity) FROM 
+                Order_Contains_Inventories orders 
+                LEFT JOIN 
+                Inventory i 
+                ON orders.inventoryId=i.InventoryId 
+                LEFT JOIN 
+                Product prod 
+                ON prod.ProductId=i.ProductId 
+                LEFT JOIN
+                Category cat
+                ON cat.CategoryId=prod.CategoryId         
+                WHERE prod.CategoryId =  
+                ( 
+                    SELECT cat.CategoryID FROM 
+                    Order_Contains_Inventories orders
+                    LEFT JOIN 
+                    Inventory i 
+                    ON orders.inventoryId=i.InventoryId 
+                    LEFT JOIN 
+                    Product prod
+                    ON prod.ProductId=i.ProductId 
+                    LEFT JOIN 
+                    Category cat
+                    ON prod.CategoryId=cat.CategoryId 
+                    GROUP BY cat.CategoryId 
+                    ORDER BY SUM(orders.Quantity) DESC 
+                    LIMIT 1 
+                ) 
+                GROUP BY 1,2
+                ORDER BY SUM(orders.Quantity*i.UnitPrice) DESC 
+                LIMIT 30;""", ())
+            for row in rows:
+                data.append({
+                    "Category Name":row[0],
+                    "Product Name": row[1],
+                    "Quantity": row[2],
+                })
+            return Response({
+                "success": True,
+                "message": "Product Details and Quantity for Graph 1 data fetched successfully",
+                "data": {"Graph 2": data}
+            }, status=200)
+        
+class fetchChartThreeData(APIView):
+        def get():
+            data = []
+            rows = getFromDB("""
+                SELECT prod.Name,sum(invent.Quantity) FROM 
+                (
+                SELECT oci.InventoryId
+                FROM 
+                Order_Contains_Inventories oci
+                LEFT JOIN
+                `Order` orr
+                ON oci.OrderId=orr.OrderId
+                WHERE ABS(DATEDIFF(orr.OrderDate,DATE('2024-05-28')))<31 AND orr.OrderDate<DATE('2024-05-28')
+                GROUP BY 1
+                HAVING SUM(oci.Quantity)<10
+                INTERSECT
+                SELECT InventoryId FROM Inventory
+                WHERE  ExpiryDate>DATE('2024-05-28') 
+                AND ABS(DATEDIFF(ExpiryDate,DATE('2024-05-28')))<15
+                )id 
+                LEFT JOIN
+                Inventory invent
+                ON id.InventoryId=invent.InventoryId
+                LEFT JOIN
+                Product prod
+                ON invent.ProductId=prod.ProductId
+                GROUP BY 1
+                """, ())
+            for row in rows:
+                data.append({
+                    "Product Name": row[0],
+                    "Quantity": row[1],
+                })
+            return Response({
+                "success": True,
+                "message": "Product Details and Quantity for Graph 3 data fetched successfully",
+                "data": {"Graph 2": data}
+            }, status=200)
+        
+
