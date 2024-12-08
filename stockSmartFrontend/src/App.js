@@ -19,7 +19,7 @@ function App() {
       {isAuthenticated && <Header setIsAuthenticated={setIsAuthenticated}/>}
       
       <Routes>
-        <Route path="/admin-portal" element={<AdminPortal />} />
+        <Route path="/admin-portal" element={<ProtectedRoute><AdminPortal /></ProtectedRoute>} />
         <Route path="/" element={isAuthenticated===true? <Header />:<Login setIsAuthenticated={setIsAuthenticated} />} />
         <Route path="/analyst-dashboard" element={
             <ProtectedRoute>
