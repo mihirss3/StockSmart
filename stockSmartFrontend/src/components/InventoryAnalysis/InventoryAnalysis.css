@@ -73,8 +73,19 @@
     background-color: #ffefdb;
     color: #cc5500;
   }
-
   .queryTable{
     display: block;
     text-align: center;
+  }
+
+  .inventory-analysis-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  .chart-container {
+    height: 600px;
+    padding: 20px;
+    overflow-y: auto;
   }
