@@ -24,4 +24,10 @@ urlpatterns = [
     path('administrator/administer/promotionaloffer/<int:promotional_offer_id>', AdminAdministerPromotionalOfferView.as_view(),
          name='adminAdministerPromotionalOffer1'),
 
+    path('analyst/AnalystChartOneView', AnalystChartOneView.as_view(), name='AnalystChartOneView'),
+    path('analyst/AnalystChartTwoView', AnalystChartTwoView.as_view(), name='AnalystChartTwoView'),
+    path('analyst/AnalystChartThreeView', AnalystChartThreeView.as_view(), name='AnalystChartThreeView'),
+    
+
+
 ]

@@ -754,8 +754,8 @@ class AdminAdministerPromotionalOfferView(APIView):
                 }, status=404)
 
 
-class fetchChartOneData(APIView):
-        def get():
+class AnalystChartOneView(APIView):
+        def get(self,request):
             data = []
             rows = getFromDB("""SELECT prod.Name,SUM(inventory.Quantity) 
                              FROM Inventory inventory INNER JOIN Product prod 
@@ -772,8 +772,8 @@ class fetchChartOneData(APIView):
                 "data": {"Graph 1": data}
             }, status=200)
         
-class fetchChartTwoData(APIView):
-        def get():
+class AnalystChartTwoView(APIView):
+        def get(self,request):
             data = []
             rows = getFromDB("""
                 SELECT cat.Name,prod.Name,SUM(i.Quantity) FROM 
@@ -815,12 +815,12 @@ class fetchChartTwoData(APIView):
                 })
             return Response({
                 "success": True,
-                "message": "Product Details and Quantity for Graph 1 data fetched successfully",
+                "message": "Product Details and Quantity for Graph 2 data fetched successfully",
                 "data": {"Graph 2": data}
             }, status=200)
         
-class fetchChartThreeData(APIView):
-        def get():
+class AnalystChartThreeView(APIView):
+        def get(self,request):
             data = []
             rows = getFromDB("""
                 SELECT prod.Name,sum(invent.Quantity) FROM 
@@ -855,7 +855,7 @@ class fetchChartThreeData(APIView):
             return Response({
                 "success": True,
                 "message": "Product Details and Quantity for Graph 3 data fetched successfully",
-                "data": {"Graph 2": data}
+                "data": {"Graph 3": data}
             }, status=200)
         
 
