@@ -21,7 +21,9 @@ urlpatterns = [
     path('administrator/administer/product/<int:product_id>', AdminAdministerProductView.as_view(), name='adminAdministerProduct1'),
 
     path('administrator/administer/promotionaloffer', AdminAdministerPromotionalOfferView.as_view(), name='adminAdministerPromotionalOffer'),
-    path('administrator/administer/promotionaloffer/<int:promotional_offer_id>', AdminAdministerPromotionalOfferView.as_view(),
-         name='adminAdministerPromotionalOffer1'),
+    path('administrator/administer/promotionaloffer/<int:promotional_offer_id>', AdminAdministerPromotionalOfferView.as_view(), name='adminAdministerPromotionalOffer1'),
+
+    path('administrator/administer/order', AdminAdministerOrderView.as_view(), name='adminAdministerOrder'),
+    path('administrator/administer/order/<int:order_id>', AdminAdministerOrderView.as_view(), name='adminAdministerOrder1'),
 
 ]

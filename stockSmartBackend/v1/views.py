@@ -1,3 +1,5 @@
+import json
+
 from rest_framework.views import APIView
 from v1.utils.db_utils import *
 from v1.utils.response_utils import *
@@ -97,7 +99,8 @@ class AdminAdministerInventoryView(APIView):
             return handleExceptionResponse(exception)
         if result:
             rows = getFromDB("""SELECT * FROM Inventory WHERE InventoryId = %s""", (inventoryId,))
-            new_inventory = rows[0]
+            row = rows[0]
+            new_inventory = {"InventoryId": row[0],"StockDate": row[1],"ProductId": row[2],"UnitPrice": row[3],"ManufactureDate": row[4],"ExpiryDate": row[5],"Quantity": row[6]}
             return handlePostResponse(new_inventory)
         return handleExceptionResponse(None)
 
@@ -130,7 +133,8 @@ class AdminAdministerInventoryView(APIView):
             return handleExceptionResponse(exception)
         if result:
             rows = getFromDB("""SELECT * FROM Inventory WHERE InventoryId = %s""", (inventory_id,))
-            updated_inventory = rows[0]
+            row = rows[0]
+            updated_inventory = {"InventoryId": row[0],"StockDate": row[1],"ProductId": row[2],"UnitPrice": row[3],"ManufactureDate": row[4],"ExpiryDate": row[5],"Quantity": row[6]}
             return handlePutResponse(updated_inventory)
 
         else:
@@ -219,7 +223,7 @@ class AdminAdministerCategoryView(APIView):
         if result:
             rows = getFromDB("""SELECT * FROM Category WHERE CategoryId = %s""", (categoryId,))
             row = rows[0]
-            new_category = [{"CategoryId": row[0],"Name": row[1],"LeadTime": row[2],"StorageRequirements": row[3]}]
+            new_category = {"CategoryId": row[0],"Name": row[1],"LeadTime": row[2],"StorageRequirements": row[3]}
             return handlePostResponse(new_category)
 
         return handleExceptionResponse(None)
@@ -387,6 +391,96 @@ class AdminAdministerPromotionalOfferView(APIView):
     def delete(self, request, promotional_offer_id):
         result, exception = deleteFromDB("DELETE FROM PromotionalOffer WHERE PromotionalOfferId = %s",
                                          (promotional_offer_id,))
+        if exception:
+            return handleExceptionResponse(exception)
+        else:
+            return handleDeleteResponse(result)
+
+
+class AdminAdministerOrderView(APIView):
+    def post(self, request):
+        data = request.data
+        orderDate = data.get("OrderDate")
+        inventories = data.get("Inventories")
+        try:
+            order_items_json = json.dumps(inventories)
+            order_id = -1
+            with connection.cursor() as cursor:
+                cursor.callproc('process_order', [orderDate, order_items_json])
+                cursor.execute("SELECT LAST_INSERT_ID()")
+                order_id = cursor.fetchone()[0]
+            print(order_id)
+            rows = getFromDB("""
+                SELECT p.Name, p.PackagingType, p.Weight, oci.Quantity, i.UnitPrice, ROUND(i.UnitPrice*oci.Quantity, 2) AS Price
+                FROM `Order` o
+                INNER JOIN Order_Contains_Inventories oci ON o.OrderId = oci.OrderId
+                INNER JOIN Inventory i ON oci.InventoryId = i.InventoryId
+                INNER JOIN Product p ON i.ProductId = p.ProductId
+                WHERE o.OrderId = %s;
+            """, (
+                order_id,
+            ))
+            orderItems = [
+                {"Name": row[0], "PackagingType": row[1], "Weight": row[2], "Quantity": row[3], "UnitPrice": row[4],
+                 "Price": row[5]}
+                for row in rows
+            ]
+            data = {
+                "OrderId": order_id,
+                "OrderDate": orderDate,
+                "OrderItems": orderItems,
+            }
+            return handlePostResponse(data)
+        except Exception as e:
+            return handleExceptionResponse(str(e))
+
+
+    def get(self, request):
+        rows = getFromDB("""SELECT o.OrderId, p.Name
+                FROM `Order` o
+                INNER JOIN Order_Contains_Inventories oci ON o.OrderId = oci.OrderId
+                INNER JOIN Inventory i ON oci.InventoryId = i.InventoryId
+                INNER JOIN Product p ON i.ProductId = p.ProductId
+                ORDER BY o.OrderId""", ())
+        temp = {}
+        for row in rows:
+            if row[0] in temp:
+                temp[row[0]].append(row[1])
+            else:
+                temp[row[0]] = [row[1]]
+        data = []
+        for key in temp:
+            data.append({"OrderId": key,"OrderItems": temp[key]})
+        return handleGetResponse(data)
+
+    def put(self, request, order_id):
+        data = request.data
+        update_query = """
+            UPDATE Order 
+            SET OrderDate = %s, TotalPrice = %s
+            WHERE OrderId = %s
+        """
+        result, exception, lastUpdatedRowId = postToDB(update_query, (
+            data.get("OrderDate"),
+            data.get("TotalPrice"),
+            order_id
+        ))
+
+        if exception:
+            return handleExceptionResponse(exception)
+
+        if result:
+            rows = getFromDB("""SELECT * FROM `Order` WHERE OrderId = %s""",
+                             (order_id,))
+            row = rows[0]
+            updated_order = {"OrderId": row[0],"OrderDate": row[1],"TotalPrice": row[2]}
+            return handlePutResponse(updated_order)
+        else:
+            return handlePutResponse(None)
+
+    def delete(self, request, order_id):
+        result, exception = deleteFromDB("DELETE FROM Order WHERE OrderId = %s",
+                                         (order_id,))
         if exception:
             return handleExceptionResponse(exception)
         else:
