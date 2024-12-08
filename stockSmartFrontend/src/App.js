@@ -1,50 +1,35 @@
-
 import './App.css';
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Header from './components/Header/Header';
-// import Sidebar from './components/Sidebar/Sidebar';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import InventoryAnalysis from './components/InventoryAnalysis/InventoryAnalysis';
+import Login from './components/Login/login';
 
 function App() {
-  const [helloMessage, setHelloMessage] = useState('');
-  const [worldMessage, setWorldMessage] = useState('');
-
-  useEffect(() => {
-    axios.get('http://127.0.0.1:8000/hello')
-      .then(response => {
-        setHelloMessage(response.data.message);
-      })
-      .catch(error => {
-        console.error("There was an error fetching the 'hello' message!", error);
-      });
-
-    axios.get('http://127.0.0.1:8000/world')
-      .then(response => {
-        setWorldMessage(response.data.message);
-      })
-      .catch(error => {
-        console.error("There was an error fetching the 'world' message!", error);
-      });
-  }, []);
-
- console.log(helloMessage);
- console.log(worldMessage);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const ProtectedRoute = ({ children }) => {
+    return isAuthenticated ? children : <Navigate to="/login" />;
+  };
 
   return (
     <Router>
     <div className="app">
-      <Header />
+      {isAuthenticated && <Header />}
       
       <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/inventory-analysis" element={<InventoryAnalysis />} />
-      </Routes>
-   
-       {/* <Sidebar /> */}
-    
+        <Route path="/login" element={isAuthenticated==true? <Header />:<Login setIsAuthenticated={setIsAuthenticated} />} />
+        <Route path="/" element={
+            <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/inventory-analysis" element={
+          <ProtectedRoute>
+            <InventoryAnalysis />
+          </ProtectedRoute>
+        } />
+      </Routes>    
     </div>
     </Router>
   );
