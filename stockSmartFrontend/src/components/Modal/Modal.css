@@ -1,0 +1,161 @@
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  /* Modal Content */
+  .modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  /* Modal Header */
+  .modal-content h2 {
+    margin-bottom: 15px;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+  }
+  
+  /* Form Group Styling */
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  /* Form Field */
+  .form-group input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+    box-sizing: border-box;
+    transition: border 0.3s ease;
+  }
+  
+  .form-group input:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+  
+  /* Inventory Entry */
+  .inventory-entry {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .inventory-entry input {
+    width: 45%;
+    margin-right: 5%;
+  }
+  
+  .inventory-entry button {
+    padding: 6px 12px;
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .inventory-entry button:hover {
+    background-color: #e44b4b;
+  }
+  
+  
+  .arrayButton{
+    padding: 10px 15px;
+    color: white;
+    background-color: #218838;
+    border: none;
+    border-radius: 4px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+  }
+  
+  .arrayButton:hover {
+    background-color: #218838;
+  }
+  
+  /* Submit and Close Buttons */
+  .submit-button,
+  .close-button {
+    padding: 10px 20px;
+    font-size: 1em;
+    border-radius: 4px;
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 48%;
+  }
+  
+  .submit-button {
+    background-color: #4c8d2c;
+    margin-right: 4%;
+  }
+  
+  .submit-button:hover {
+    background-color: #31740f;
+  }
+  
+  .close-button {
+    background-color: #6c757d;
+  }
+  
+  .close-button:hover {
+    background-color: #5a6268;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 600px) {
+    .modal-content {
+      width: 90%;
+    }
+  
+    .inventory-entry input {
+      width: 40%;
+    }
+  
+    button[type="button"] {
+      width: 100%;
+    }
+  
+    .submit-button,
+    .close-button {
+      width: 48%;
+    }
+  }
+  
+  /* Animation */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  

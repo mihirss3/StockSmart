@@ -1,25 +1,27 @@
 import './App.css';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Header from './components/Header/Header';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import InventoryAnalysis from './components/InventoryAnalysis/InventoryAnalysis';
 import Login from './components/Login/login';
+import AdminPortal from './components/AdminPortal/AdminPortal';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const ProtectedRoute = ({ children }) => {
-    return isAuthenticated ? children : <Navigate to="/login" />;
+    return isAuthenticated ? children : <Navigate to="/" />;
   };
 
   return (
     <Router>
     <div className="app">
-      {isAuthenticated && <Header />}
+      {isAuthenticated && <Header setIsAuthenticated={setIsAuthenticated}/>}
       
       <Routes>
-        <Route path="/login" element={isAuthenticated==true? <Header />:<Login setIsAuthenticated={setIsAuthenticated} />} />
-        <Route path="/" element={
+        <Route path="/admin-portal" element={<AdminPortal />} />
+        <Route path="/" element={isAuthenticated===true? <Header />:<Login setIsAuthenticated={setIsAuthenticated} />} />
+        <Route path="/analyst-dashboard" element={
             <ProtectedRoute>
             <Dashboard />
           </ProtectedRoute>

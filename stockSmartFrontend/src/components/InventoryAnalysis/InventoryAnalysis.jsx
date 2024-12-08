@@ -86,6 +86,23 @@ const InventoryAnalysis = () => {
   };
 
   useEffect(() => {
+    // Fetch data from the backend
+    // const fetchExpiringProducts = async () => {
+    //   try {
+    //     const response = await fetch("http://localhost:8000/administrator/administer/inventory"); // API endpoint
+    //     if (!response.ok) {
+    //       throw new Error("Failed to fetch data");
+    //     }
+    //     const data = await response.json();
+    //     console.log(data.data)
+    //     setProducts(data.data); // Set fetched data
+    //   } catch (error) {
+    //     console.error("Error fetching data:", error);
+    //   } finally {
+    //     setIsLoading(false);
+    //   }
+    // };
+    // fetchExpiringProducts();
     // Simulate API call with sample data
     setProducts(sampleData["Graph 1"]);
     setIsLoading(false);

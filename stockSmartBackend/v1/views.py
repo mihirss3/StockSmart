@@ -52,9 +52,9 @@ class AdminAdministerUserView(APIView):
         return handleExceptionResponse(None)
 
     def get(self, request):
-        rows = getFromDB("""SELECT EmailId, FirstName, LastName, PhoneNumber FROM User WHERE Type='Analyst'""",())
+        rows = getFromDB("""SELECT EmailId, Type, FirstName, LastName, PhoneNumber FROM User WHERE Type='Analyst'""",())
         data = [
-            {"EmailId": row[0], "FirstName": row[1], "LastName": row[2], "PhoneNumber": row[3]}
+            {"EmailId": row[0], "Type": row[1], "FirstName": row[2], "LastName": row[3], "PhoneNumber": row[4]}
             for row in rows
         ]
         return handleGetResponse(data)

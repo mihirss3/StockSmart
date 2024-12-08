@@ -4,6 +4,8 @@
   height: fit-content;
   font-family: Arial, sans-serif;
   height: 100vh;
+  overflow-x: hidden;
+  width: 100vw;
 }
 
 .main-layout {

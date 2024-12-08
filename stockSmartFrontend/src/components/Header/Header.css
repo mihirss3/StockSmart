@@ -1,7 +1,9 @@
 .header {
+/* position: sticky;
+top: 0; */
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: end;
   padding: 10px 20px;
   background-color: #2f3e46;
   color: #ffffff;
@@ -42,4 +44,20 @@
 
 .search-icon{
   color: black;
+}
+
+.logout-button {
+  background-color: #3c505b;
+  color: rgb(218, 217, 217);
+  border: none;
+  font-weight: bold;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: rgb(18, 49, 71);
 }

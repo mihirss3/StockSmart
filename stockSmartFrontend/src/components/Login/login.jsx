@@ -18,7 +18,11 @@ const Login = ({ setIsAuthenticated }) => {
     
             if (response.data.success) {
                 setIsAuthenticated(true);
-                navigate('/');
+                if(response.data.data.type==="Admin"){
+                    navigate('/admin-portal');
+                }else{
+                    navigate('/analyst-dashboard');
+                }
             }
         } catch (error) {
             alert(error.response?.data?.message || 'Invalid credentials');
