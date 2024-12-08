@@ -1,19 +1,7 @@
 import json
 
-from rest_framework.views import APIView
 from v1.utils.db_utils import *
 from v1.utils.response_utils import *
-from django.http import JsonResponse
-from rest_framework.views import APIView
-from rest_framework.response import Response
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, mean_absolute_percentage_error
-from sklearn.preprocessing import LabelEncoder
-from sklearn.pipeline import make_pipeline
-from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import pandas as pd
@@ -24,7 +12,6 @@ from sklearn.metrics import mean_squared_error, mean_absolute_percentage_error
 from sklearn.preprocessing import LabelEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import make_pipeline
-
 
 class IndexView(APIView):
     def get(self, request):
@@ -509,149 +496,89 @@ class AdminAdministerOrderView(APIView):
 
 
 class AnalystChartOneView(APIView):
-        def get(self,request):
-            data = []
-            rows = getFromDB("""SELECT prod.Name,SUM(inventory.Quantity) 
-                             FROM Inventory inventory INNER JOIN Product prod 
-                             ON inventory.ProductId=prod.ProductId
-                             GROUP BY 1""", ())
-            for row in rows:
-                data.append({
-                    "Product Name": row[0],
-                    "Quantity": row[1],
-                })
-            return Response({
-                "success": True,
-                "message": "Product Details and Quantity for Graph 1 data fetched successfully",
-                "data": {"Graph 1": data}
-            }, status=200)
+    def get(self,request):
+        rows = getFromDB("""SELECT prod.Name,SUM(inventory.Quantity) 
+                         FROM Inventory inventory INNER JOIN Product prod 
+                         ON inventory.ProductId=prod.ProductId
+                         GROUP BY 1""", ())
+        data = [
+            {"Product Name": row[0],"Quantity": row[1]}
+            for row in rows
+        ]
+        return handleGetResponse(data)
 
 class AnalystChartTwoView(APIView):
-        def get(self,request):
-            data = []
-            rows = getFromDB("""
-                SELECT cat.Name,prod.Name,SUM(i.Quantity) FROM 
-                Order_Contains_Inventories orders 
+    def get(self,request):
+        rows = getFromDB("""
+            SELECT cat.Name,prod.Name,SUM(i.Quantity) FROM 
+            Order_Contains_Inventories orders 
+            LEFT JOIN 
+            Inventory i 
+            ON orders.inventoryId=i.InventoryId 
+            LEFT JOIN 
+            Product prod 
+            ON prod.ProductId=i.ProductId 
+            LEFT JOIN
+            Category cat
+            ON cat.CategoryId=prod.CategoryId         
+            WHERE prod.CategoryId =  
+            ( 
+                SELECT cat.CategoryID FROM 
+                Order_Contains_Inventories orders
                 LEFT JOIN 
                 Inventory i 
                 ON orders.inventoryId=i.InventoryId 
                 LEFT JOIN 
-                Product prod 
+                Product prod
                 ON prod.ProductId=i.ProductId 
-                LEFT JOIN
+                LEFT JOIN 
                 Category cat
-                ON cat.CategoryId=prod.CategoryId         
-                WHERE prod.CategoryId =  
-                ( 
-                    SELECT cat.CategoryID FROM 
-                    Order_Contains_Inventories orders
-                    LEFT JOIN 
-                    Inventory i 
-                    ON orders.inventoryId=i.InventoryId 
-                    LEFT JOIN 
-                    Product prod
-                    ON prod.ProductId=i.ProductId 
-                    LEFT JOIN 
-                    Category cat
-                    ON prod.CategoryId=cat.CategoryId 
-                    GROUP BY cat.CategoryId 
-                    ORDER BY SUM(orders.Quantity) DESC 
-                    LIMIT 1 
-                ) 
-                GROUP BY 1,2
-                ORDER BY SUM(orders.Quantity*i.UnitPrice) DESC 
-                LIMIT 30;""", ())
-            for row in rows:
-                data.append({
-                    "Category Name":row[0],
-                    "Product Name": row[1],
-                    "Quantity": row[2],
-                })
-            return Response({
-                "success": True,
-                "message": "Product Details and Quantity for Graph 2 data fetched successfully",
-                "data": {"Graph 2": data}
-            }, status=200)
+                ON prod.CategoryId=cat.CategoryId 
+                GROUP BY cat.CategoryId 
+                ORDER BY SUM(orders.Quantity) DESC 
+                LIMIT 1 
+            ) 
+            GROUP BY 1,2
+            ORDER BY SUM(orders.Quantity*i.UnitPrice) DESC 
+            LIMIT 30;""", ())
+        data = [
+            {"Category Name":row[0],"Product Name": row[1],"Quantity": row[2]}
+            for row in rows
+        ]
+        return handleGetResponse(data)
 
 class AnalystChartThreeView(APIView):
-        def get(self,request):
-            data = []
-            rows = getFromDB("""
-                SELECT prod.Name,sum(invent.Quantity) FROM 
-                (
-                SELECT oci.InventoryId
-                FROM 
-                Order_Contains_Inventories oci
-                LEFT JOIN
-                `Order` orr
-                ON oci.OrderId=orr.OrderId
-                WHERE ABS(DATEDIFF(orr.OrderDate,DATE('2024-05-28')))<31 AND orr.OrderDate<DATE('2024-05-28')
-                GROUP BY 1
-                HAVING SUM(oci.Quantity)<10
-                INTERSECT
-                SELECT InventoryId FROM Inventory
-                WHERE  ExpiryDate>DATE('2024-05-28') 
-                AND ABS(DATEDIFF(ExpiryDate,DATE('2024-05-28')))<15
-                )id 
-                LEFT JOIN
-                Inventory invent
-                ON id.InventoryId=invent.InventoryId
-                LEFT JOIN
-                Product prod
-                ON invent.ProductId=prod.ProductId
-                GROUP BY 1
-                """, ())
-            for row in rows:
-                data.append({
-                    "Product Name": row[0],
-                    "Quantity": row[1],
-                })
-            return Response({
-                "success": True,
-                "message": "Product Details and Quantity for Graph 3 data fetched successfully",
-                "data": {"Graph 3": data}
-            }, status=200)
-
-class CreateWideTable(APIView):
-    def get(self, request):
-        getFromDB(""" 
-                    DROP TABLE IF EXISTS Stock_Smart_Wide;
-                    CREATE TABLE Stock_Smart_Wide AS 
-                    SELECT orders.OrderId, orders.OrderDate, orders.TotalPrice, 
-                    invent.InventoryId, invent.StockDate, invent.UnitPrice, invent.ManufactureDate, invent.ExpiryDate, invent.Quantity,
-                    prod.ProductId, prod.Name as ProductName, prod.PackagingType, prod.weight, 
-                    supp.SupplierId, supp.Name AS SupplierName, supp.Address, supp.Contact,
-                    cat.CategoryId, cat.Name as CategoryName, cat.LeadTime, cat.StorageRequirements,
-                    prom.PromotionalOfferId, prom.StartDate, prom.EndDate, prom.DiscountRate
-                    FROM
-                    `Order` orders
-                    LEFT JOIN
-                    Order_Contains_Inventories a
-                    ON orders.OrderId=a.OrderId
-                    LEFT JOIN
-                    Inventory invent
-                    ON a.InventoryId=invent.InventoryId
-                    LEFT JOIN
-                    Product prod
-                    ON invent.ProductId=prod.ProductId
-                    LEFT JOIN
-                    Category cat
-                    ON prod.CategoryId=cat.CategoryId
-                    LEFT JOIN
-                    Supplier supp
-                    ON supp.SupplierId=prod.SupplierId
-                    LEFT JOIN
-                    PromotionalOffers_AppliedOn_Order b
-                    ON orders.OrderId=b.OrderId
-                    LEFT JOIN
-                    PromotionalOffer prom
-                    ON prom.PromotionalOfferId=b.PromotionalOfferId;
-                    """,())
-        return Response({
-                "success": True,
-                "message": "Wide Table Created Successfully"
-            }, status=201)
-
+    def get(self,request):
+        rows = getFromDB("""
+            SELECT prod.Name,sum(invent.Quantity) FROM 
+            (
+            SELECT oci.InventoryId
+            FROM 
+            Order_Contains_Inventories oci
+            LEFT JOIN
+            `Order` orr
+            ON oci.OrderId=orr.OrderId
+            WHERE ABS(DATEDIFF(orr.OrderDate,DATE('2024-05-28')))<31 AND orr.OrderDate<DATE('2024-05-28')
+            GROUP BY 1
+            HAVING SUM(oci.Quantity)<10
+            INTERSECT
+            SELECT InventoryId FROM Inventory
+            WHERE  ExpiryDate>DATE('2024-05-28') 
+            AND ABS(DATEDIFF(ExpiryDate,DATE('2024-05-28')))<15
+            )id 
+            LEFT JOIN
+            Inventory invent
+            ON id.InventoryId=invent.InventoryId
+            LEFT JOIN
+            Product prod
+            ON invent.ProductId=prod.ProductId
+            GROUP BY 1
+            """, ())
+        data = [
+            {"Product Name": row[0],"Quantity": row[1]}
+            for row in rows
+        ]
+        return handleGetResponse(data)
 
 class CustomLabelEncoder:
     def __init__(self):
@@ -786,7 +713,7 @@ class AnalystForecastView(APIView):
             })
 
             # Insert predicted values into the forecast table using Django's method
-            result, exception = postToDB(
+            result, exception, lastUpdatedRowId = postToDB(
                 """INSERT INTO Forecast (ProductId, ForecastDate, ForecastQuantity) VALUES (%s, %s, %s)""",
                 (product_row['ProductId'], tomorrow_date.isoformat(), int(round(predicted_quantity)))
             )

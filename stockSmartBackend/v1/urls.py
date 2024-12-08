@@ -26,13 +26,9 @@ urlpatterns = [
     path('administrator/administer/order', AdminAdministerOrderView.as_view(), name='adminAdministerOrder'),
     path('administrator/administer/order/<int:order_id>', AdminAdministerOrderView.as_view(), name='adminAdministerOrder1'),
 
-    path('analyst/AnalystChartOneView', AnalystChartOneView.as_view(), name='AnalystChartOneView'),
-    path('analyst/AnalystChartTwoView', AnalystChartTwoView.as_view(), name='AnalystChartTwoView'),
-    path('analyst/AnalystChartThreeView', AnalystChartThreeView.as_view(), name='AnalystChartThreeView'),
-    path('CreateWideTable', CreateWideTable.as_view(), name='CreateWideTable'),
-    path('analyst/AnalystForecastView', AnalystForecastView.as_view(), name='AnalystForecastView'),
-
-    
-
+    path('analyst/AnalystChartOneView', AnalystChartOneView.as_view(), name='analystChartOneView'),
+    path('analyst/AnalystChartTwoView', AnalystChartTwoView.as_view(), name='analystChartTwoView'),
+    path('analyst/AnalystChartThreeView', AnalystChartThreeView.as_view(), name='analystChartThreeView'),
+    path('analyst/AnalystForecastView', AnalystForecastView.as_view(), name='analystForecastView'),
 
 ]
