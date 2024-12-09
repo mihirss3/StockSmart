@@ -733,3 +733,57 @@ class AnalystForecastView(APIView):
             }
         }, status=200)
 
+class AnalystKPIView(APIView):
+    def get(self,request):
+        data=[]
+        rows_KPIOne=getFromDB("""
+                       SELECT COUNT(DISTINCT ProductId) 
+                        FROM (
+                            SELECT DISTINCT ProductId 
+                            FROM Inventory
+                            WHERE ProductId NOT IN (
+                                SELECT DISTINCT ProductId 
+                                FROM Alerts
+                                UNION
+                                SELECT DISTINCT ProductId 
+                                FROM Product
+                                WHERE ProductId NOT IN (
+                                    SELECT DISTINCT ProductId 
+                                    FROM Inventory 
+                                    WHERE Quantity > 0
+                                )
+                                UNION 
+                                SELECT DISTINCT ProductId 
+                                FROM Inventory
+                                WHERE ExpiryDate < CURRENT_DATE
+                            )
+                        ) AS ValidProducts;""",())
+        rows_KPITwo=getFromDB("""SELECT COUNT(DISTINCT ProductId) FROM 
+                                Alerts
+                                WHERE AlertType="OutOfStockSoon" """,())
+        rows_KPIThree=getFromDB("""SELECT COUNT(DISTINCT ProductId) FROM 
+                                    Inventory
+                                    WHERE ExpiryDate<=CURRENT_DATE() """,())
+        rows_KPIFour=getFromDB("""SELECT COUNT(DISTINCT ProductId) FROM 
+                                Product
+                                WHERE ProductId 
+                               NOT IN (SELECT DISTINCT ProductId FROM Inventory WHERE Quantity>0)""",()
+                               )
+        data=[{"Products In Stock":rows_KPIOne,"Products Out of Stock Soon":rows_KPITwo,"Products Expiring Soon": rows_KPIThree,"Products Out of Stock":rows_KPIFour}]
+        return handleGetResponse(data)
+
+class AnalystChartFourView(APIView):
+    def get(self,request):
+        data=[]
+        rows=getFromDB("""
+                       SELECT ProductId,ForecastDate,SUM(ForecastQuantity) as ForecastQuantity FROM 
+                        Forecast
+                       GROUP BY 1,2
+                        """,())
+        data = [
+            {"ProductId":row[0],"ForecastDate": row[1],"ForecastQuantity": row[2]}
+            for row in rows
+        ]
+        return handleGetResponse(data)
+
+        

@@ -29,6 +29,8 @@ urlpatterns = [
     path('analyst/AnalystChartOneView', AnalystChartOneView.as_view(), name='analystChartOneView'),
     path('analyst/AnalystChartTwoView', AnalystChartTwoView.as_view(), name='analystChartTwoView'),
     path('analyst/AnalystChartThreeView', AnalystChartThreeView.as_view(), name='analystChartThreeView'),
+    path('analyst/AnalystChartFourView', AnalystChartFourView.as_view(), name='analystChartFourView'),
     path('analyst/AnalystForecastView', AnalystForecastView.as_view(), name='analystForecastView'),
+    path('analyst/AnalystKPIView', AnalystKPIView.as_view(), name='AnalystKPIView'),
 
 ]
