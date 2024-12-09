@@ -42,11 +42,11 @@ const InventoryAnalysis = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const responseOne = await fetch('http://localhost:8000/analyst/AnalystChartOneView');
-        const responseTwo = await fetch('http://localhost:8000/analyst/AnalystChartTwoView');
-        const responseThree = await fetch('http://localhost:8000/analyst/AnalystChartThreeView');
-        const responseFour = await fetch('http://localhost:8000/analyst/AnalystChartFourView');
-        const responseKpi = await fetch('http://localhost:8000/analyst/AnalystKPIView');
+        const responseOne = await fetch('https://smart-stock-backend-1044918252759.us-central1.run.app/analyst/AnalystChartOneView');
+        const responseTwo = await fetch('https://smart-stock-backend-1044918252759.us-central1.run.app/analyst/AnalystChartTwoView');
+        const responseThree = await fetch('https://smart-stock-backend-1044918252759.us-central1.run.app/analyst/AnalystChartThreeView');
+        const responseFour = await fetch('https://smart-stock-backend-1044918252759.us-central1.run.app/analyst/AnalystChartFourView');
+        const responseKpi = await fetch('https://smart-stock-backend-1044918252759.us-central1.run.app/analyst/AnalystKPIView');
 
         const dataOne = await responseOne.json();
         const dataTwo = await responseTwo.json();
