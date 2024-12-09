@@ -35,13 +35,13 @@ const AdminPortal = () => {
 
   const fetchData = async (schema) => {
     const apiEndpoints = {
-      User: 'https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/user',
-      "Promotional Offer": 'https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/promotionaloffer',
-      Supplier: 'https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/supplier',
-      Category: 'https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/category',
-      Product: 'https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/product',
-      Inventory: 'https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/inventory',
-      // Order: 'https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/order',
+      User: 'http://localhost:8000/administrator/administer/user',
+      "Promotional Offer": 'http://localhost:8000/administrator/administer/promotionaloffer',
+      Supplier: 'http://localhost:8000/administrator/administer/supplier',
+      Category: 'http://localhost:8000/administrator/administer/category',
+      Product: 'http://localhost:8000/administrator/administer/product',
+      Inventory: 'http://localhost:8000/administrator/administer/inventory',
+      // Order: 'http://localhost:8000/administrator/administer/order',
     };
   
     try {
@@ -74,12 +74,12 @@ const AdminPortal = () => {
 
   const handleAdd = async (formData) => {
     const apiEndpoints = {
-      "User": `https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/user`,
-      "Promotional Offer": `https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/promotionaloffer`,
-      "Supplier": `https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/supplier`,
-      "Category": `https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/category`,
-      "Product": `https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/product`,
-      "Inventory": `https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/inventory`,
+      "User": `http://localhost:8000/administrator/administer/user`,
+      "Promotional Offer": `http://localhost:8000/administrator/administer/promotionaloffer`,
+      "Supplier": `http://localhost:8000/administrator/administer/supplier`,
+      "Category": `http://localhost:8000/administrator/administer/category`,
+      "Product": `http://localhost:8000/administrator/administer/product`,
+      "Inventory": `http://localhost:8000/administrator/administer/inventory`,
     };
   
     const endpoint = apiEndpoints[selectedSchema]; // Use selectedSchema to determine the schema

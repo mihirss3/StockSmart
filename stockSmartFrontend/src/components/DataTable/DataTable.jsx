@@ -42,12 +42,12 @@ const DataTable = ({ data, setData, schema }) => {
     console.log("values", values)
 
     const apiEndpoints = {
-      "User": `https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/user/${row.original.EmailId}`,
-      "Promotional Offer": `https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/promotionaloffer/${row.original.PromotionalOfferId}`,
-      "Supplier": `https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/supplier/${row.original.SupplierId}`,
-      "Category": `https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/category/${row.original.CategoryId}`,
-      "Product": `https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/product/${row.original.ProductId}`,
-      "Inventory": `https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/inventory/${row.original.InventoryId}`,
+      "User": `http://localhost:8000/administrator/administer/user/${row.original.EmailId}`,
+      "Promotional Offer": `http://localhost:8000/administrator/administer/promotionaloffer/${row.original.PromotionalOfferId}`,
+      "Supplier": `http://localhost:8000/administrator/administer/supplier/${row.original.SupplierId}`,
+      "Category": `http://localhost:8000/administrator/administer/category/${row.original.CategoryId}`,
+      "Product": `http://localhost:8000/administrator/administer/product/${row.original.ProductId}`,
+      "Inventory": `http://localhost:8000/administrator/administer/inventory/${row.original.InventoryId}`,
     };
   
     const endpoint = apiEndpoints[schema];
@@ -149,12 +149,12 @@ const DataTable = ({ data, setData, schema }) => {
     if (confirmDelete) {
       try {
         const apiEndpoints = {
-          "User": `https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/user/${row.original.EmailId}`, // Example for User, assuming Email is unique
-          "Promotional Offer": `https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/promotionaloffer/${row.original.PromotionalOfferId}`, // Example for Promotional Offer, assuming Id is unique
-          "Supplier": `https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/supplier/${row.original.SupplierId}`, // Example for Supplier, assuming SupplierId is unique
-          "Category": `https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/category/${row.original.CategoryId}`, // Example for Category
-          "Product": `https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/product/${row.original.ProductId}`, // Example for Product
-          "Inventory": `https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/inventory/${row.original.InventoryId}`, // Example for Inventory
+          "User": `http://localhost:8000/administrator/administer/user/${row.original.EmailId}`, // Example for User, assuming Email is unique
+          "Promotional Offer": `http://localhost:8000/administrator/administer/promotionaloffer/${row.original.PromotionalOfferId}`, // Example for Promotional Offer, assuming Id is unique
+          "Supplier": `http://localhost:8000/administrator/administer/supplier/${row.original.SupplierId}`, // Example for Supplier, assuming SupplierId is unique
+          "Category": `http://localhost:8000/administrator/administer/category/${row.original.CategoryId}`, // Example for Category
+          "Product": `http://localhost:8000/administrator/administer/product/${row.original.ProductId}`, // Example for Product
+          "Inventory": `http://localhost:8000/administrator/administer/inventory/${row.original.InventoryId}`, // Example for Inventory
         };
 
         const url = apiEndpoints[schema];
@@ -182,13 +182,13 @@ const DataTable = ({ data, setData, schema }) => {
 
   const fetchData = async (schema) => {
     const apiEndpoints = {
-      User: 'https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/user',
-      "Promotional Offer": 'https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/promotionaloffer',
-      Supplier: 'https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/supplier',
-      Category: 'https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/category',
-      Product: 'https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/product',
-      Inventory: 'https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/inventory',
-      // Order: 'https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/order',
+      User: 'http://localhost:8000/administrator/administer/user',
+      "Promotional Offer": 'http://localhost:8000/administrator/administer/promotionaloffer',
+      Supplier: 'http://localhost:8000/administrator/administer/supplier',
+      Category: 'http://localhost:8000/administrator/administer/category',
+      Product: 'http://localhost:8000/administrator/administer/product',
+      Inventory: 'http://localhost:8000/administrator/administer/inventory',
+      // Order: 'http://localhost:8000/administrator/administer/order',
     };
   
     try {
