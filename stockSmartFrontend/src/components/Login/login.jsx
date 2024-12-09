@@ -11,7 +11,7 @@ const Login = ({ setIsAuthenticated }) => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://127.0.0.1:8000/login', {
+            const response = await axios.post('https://smart-stock-backend-1044918252759.us-central1.run.app/login', {
                 emailId: email,
                 password: password
             });

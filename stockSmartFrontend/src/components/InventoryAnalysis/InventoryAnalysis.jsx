@@ -89,7 +89,7 @@ const InventoryAnalysis = () => {
     // Fetch data from the backend
     // const fetchExpiringProducts = async () => {
     //   try {
-    //     const response = await fetch("http://localhost:8000/administrator/administer/inventory"); // API endpoint
+    //     const response = await fetch("https://smart-stock-backend-1044918252759.us-central1.run.app/administrator/administer/inventory"); // API endpoint
     //     if (!response.ok) {
     //       throw new Error("Failed to fetch data");
     //     }
