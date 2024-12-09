@@ -11,6 +11,11 @@
     min-width: 80%;
     background-color: #f9f9f9;
   }
+
+ .main-inventory-content{
+    max-width: 100%;
+    min-width: 100%;
+}
   
   .popup {
     position: fixed;

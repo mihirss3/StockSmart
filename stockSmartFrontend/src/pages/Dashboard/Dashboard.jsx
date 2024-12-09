@@ -38,8 +38,8 @@ const Dashboard = () => {
         </div>
     
       <div className="dashboard-cards">
-        <Card title="Current Inventory Analysis" onClick={handleFirstCardClick}/>
-        <Card title="Demand Forecast" />
+        <Card title="Current Inventory Analysis and Demand Forecast" onClick={handleFirstCardClick}/>
+        {/* <Card title="Demand Forecast" /> */}
 
       </div>
     </main>

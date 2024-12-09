@@ -500,7 +500,7 @@ class AnalystChartOneView(APIView):
         rows = getFromDB("""SELECT prod.Name,SUM(inventory.Quantity) 
                          FROM Inventory inventory INNER JOIN Product prod 
                          ON inventory.ProductId=prod.ProductId
-                         GROUP BY 1""", ())
+                         GROUP BY 1 LIMIT 25 """, ())
         data = [
             {"Product Name": row[0],"Quantity": row[1]}
             for row in rows
@@ -769,19 +769,19 @@ class AnalystKPIView(APIView):
                                 WHERE ProductId 
                                NOT IN (SELECT DISTINCT ProductId FROM Inventory WHERE Quantity>0)""",()
                                )
-        data=[{"Products In Stock":rows_KPIOne,"Products Out of Stock Soon":rows_KPITwo,"Products Expiring Soon": rows_KPIThree,"Products Out of Stock":rows_KPIFour}]
+        data={"ProductsInStock":rows_KPIOne[0][0],"ProductsOutOfStockSoon":rows_KPITwo[0][0],"ProductsExpiringSoon": rows_KPIThree[0][0],"ProductsOutOfStock":rows_KPIFour[0][0]}
         return handleGetResponse(data)
 
 class AnalystChartFourView(APIView):
     def get(self,request):
-        data=[]
         rows=getFromDB("""
-                       SELECT ProductId,ForecastDate,SUM(ForecastQuantity) as ForecastQuantity FROM 
-                        Forecast
+                       SELECT p.Name,ForecastDate,SUM(ForecastQuantity) as ForecastQuantity FROM 
+                        Forecast f
+                        LEFT JOIN Product p ON f.ProductId = p.ProductId 
                        GROUP BY 1,2
                         """,())
         data = [
-            {"ProductId":row[0],"ForecastDate": row[1],"ForecastQuantity": row[2]}
+            {"ProductName":row[0],"ForecastDate": row[1],"ForecastQuantity": row[2]}
             for row in rows
         ]
         return handleGetResponse(data)
