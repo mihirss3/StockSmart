@@ -1,0 +1,14 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+  font-family: Arial, sans-serif;
+  height: 100vh;
+  overflow-x: hidden;
+  width: 100vw;
+}
+
+.main-layout {
+  display: flex;
+  flex: 1;
+}

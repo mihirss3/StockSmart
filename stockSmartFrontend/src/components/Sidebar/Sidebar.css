@@ -1,0 +1,52 @@
+.sidebar {
+  max-width: 19%;
+  min-width: 19%;
+    background-color: #2f3e46;
+    color: white;
+    text-align: center;
+    height: auto;
+    margin: none;
+  }
+  
+  .sidebar h2 {
+    width: 100%;
+    
+    color: white;
+    font-weight: bolder;
+    font-size:x-large;
+  }
+  
+  .sidebar ul {
+    width: 100%;
+    list-style: none;
+    padding: 0;
+  }
+  
+  .sidebar li {
+    margin: 10px 0;
+    cursor: pointer;
+    padding: 30px 10px;
+    border-radius: 5px;
+  }
+  
+.sidebar li.selected {
+    background-color: rgb(23, 41, 53);
+    padding: 30px 10px;
+
+  }
+
+  .schemaName {
+    font-weight: bold;
+    font-size: large;
+  }
+
+  .schemaHeading{
+    height: 100px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+    background-color: rgb(21, 27, 32);
+  }
+  

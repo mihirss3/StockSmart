@@ -1,0 +1,63 @@
+.header {
+/* position: sticky;
+top: 0; */
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  padding: 10px 20px;
+  background-color: #2f3e46;
+  color: #ffffff;
+}
+
+.menu-icon  {
+  width: 20px;
+  height: 3px;
+  margin: 15px 0 0 15px;
+  cursor: pointer;
+}
+
+.menu-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 50px;
+}
+
+.search-bar-input {
+  padding-left: 30px;
+  border: none !important;
+  outline: none !important;
+}
+
+.user-icon {
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.search-icon{
+  color: black;
+}
+
+.logout-button {
+  background-color: #3c505b;
+  color: rgb(218, 217, 217);
+  border: none;
+  font-weight: bold;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: rgb(18, 49, 71);
+}

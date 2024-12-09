@@ -12,7 +12,7 @@
 | Member2     |     Prajakta Pikale    |
 | Member2     |  ppikale2@illinois.edu |
 | Member3     |     Mihir Shah         |
-| Member3     |  mihirss3@illinois.edu |
+| Member3     |  mihirss3@illinois.edu |    
 
 ## Project Information
 
